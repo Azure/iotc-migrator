@@ -1,0 +1,9 @@
+@import "./constants";
+
+// specify the segoe icons font src:
+@font-face {
+    font-family: "icons";
+    font-display: "block"; // don't fallback to other fonts while downloading
+    src: url("./segmdl2.1.61.woff") format("woff"),
+        url("./segmdl2.1.61.ttf") format("truetype");
+}

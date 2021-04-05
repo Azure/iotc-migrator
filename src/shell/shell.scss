@@ -1,0 +1,60 @@
+@import "../styles/_constants";
+@import "../styles/_colors";
+@import "../styles/_fonts";
+@import "../styles/_icons";
+@import "../styles/_mixins";
+@import "../styles/_typography";
+
+.shell {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.sign-out {
+    margin-right: 0.5rem;
+    button {
+        cursor: pointer;
+        border: 0;
+        background-color: transparent;
+    }
+
+    button:hover {
+        color: lightgray;
+    }
+}
+
+.no-auth {
+    text-align: right;
+    padding: 0 1rem 1rem 0;
+    font-weight: 1000;
+    color: red;
+}
+
+.waffle-button {
+    button {
+        cursor: pointer;
+        width: 3.1rem;
+        padding: 0.8rem 1rem;
+        background-color: transparent;
+        border: none;
+        margin-right: -13px;
+    }
+
+    button:hover {
+        background-color: white;
+        color: black;
+    }
+
+    button:focus {
+        outline: none;
+    }
+}
+
+.waffle-panel-nav {
+    width: 320px;
+}
+
+.ms-Panel-content {
+    padding: 0 1rem;
+}

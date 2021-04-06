@@ -33,12 +33,11 @@
 
 .waffle-button {
     button {
+        width: 50px;
         cursor: pointer;
-        width: 3.1rem;
-        padding: 0.8rem 1rem;
+        padding: 1rem;
         background-color: transparent;
         border: none;
-        margin-right: -13px;
     }
 
     button:hover {
@@ -46,13 +45,29 @@
         color: black;
     }
 
+    /* should not do this hack */
     button:focus {
         outline: none;
     }
 }
 
 .waffle-panel-nav {
-    width: 320px;
+    padding-right: 1rem;
+    min-width: 320px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 0.025em;
+    }
+}
+
+.arrow-icon {
+    font-size: 0.6rem;
+    margin-left: 0.25rem;
 }
 
 .ms-Panel-content {

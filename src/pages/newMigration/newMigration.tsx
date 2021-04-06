@@ -95,13 +95,16 @@ function NewMigration() {
             <br />
             <p>0 devices</p>
           </div>
-          <div className='field-group'>
+
+          {appCopy !== "1" ? null : <div className='field-group'>
             <h2>Device template</h2>
             <Checkbox label="Copy the associated device template" onChange={() => { }} />
-          </div>
+          </div>}
+
           <div className='field-group'>
             <PrimaryButton onClick={() => { }} text="Migrate" />
           </div>
+
         </div>
       </div>
     </div >

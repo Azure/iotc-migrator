@@ -9,7 +9,7 @@ const cx = classnames.bind(require('./shell.scss'));
 export function Navigation() {
     return (
         <>
-            <NavItem to={Paths.new.index} exact title='View saved queries' icon='DependencyAdd' text='New migration' />
+            <NavItem to={Paths.new.index} exact title='View saved queries' icon='TurnRight' text='New migration' />
             <NavItem to={Paths.status.index} exact title='Build a query and pin to the dashboard' icon='SyncStatus' text='Migration status' />
         </>
     );

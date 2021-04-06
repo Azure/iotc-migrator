@@ -1,0 +1,40 @@
+.waffle-apps {
+    padding-bottom: 2rem;
+    a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 0.025em;
+    }
+}
+.waffle-apps-tiles {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.waffle-apps-tile {
+    cursor: pointer;
+    height: 4rem;
+    width: 128px;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: none;
+    margin: 0 1rem 1rem 0;
+
+    div > i {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+}
+
+.waffle-apps-tile:hover {
+    padding-left: 5px;
+    border: solid 1px rgb(244, 244, 244);
+    box-shadow: 0.1rem 0.5rem 0.75rem 0 rgba(0, 0, 0, 0.1);
+}
+
+.waffle-apps-tile:active {
+    padding-left: 8px;
+    outline: solid 1px rgb(244, 244, 244);
+    box-shadow: 0.1rem 0.1rem 0.75rem 0 rgba(0, 0, 0, 0.1);
+}

@@ -10,6 +10,8 @@ import { Panel, PanelType, IPanelProps } from '@fluentui/react/lib/Panel';
 import { IRenderFunction } from '@fluentui/react/lib/Utilities';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 
+import Waffle from '../controls/waffle';
+
 function signOut(signOutHandler: any) {
   return <div className='sign-out'>
     <button title='Sign Out' onClick={signOutHandler}><FontIcon iconName='SignOut' className='global-nav-item-icon' /></button>
@@ -18,7 +20,7 @@ function signOut(signOutHandler: any) {
 
 function waffleDOM(showWaffle: any, value: boolean) {
   return <div className='waffle-button'>
-    <button title='Additional tools' onClick={() => showWaffle(value)}><FontIcon iconName='WaffleOffice365' className='global-nav-item-icon' /></button>
+    <button title='Additional tools' onClick={() => showWaffle(value)}><FontIcon iconName='WaffleOffice365' className='waffle-icon' /></button>
   </div>
 }
 
@@ -43,6 +45,7 @@ function Shell() {
     (props, defaultRender) => (
       <div className="waffle-panel-nav">
         {waffleDOM(showWaffle, false)}
+        <a href="https://apps.azureiotcentral.com/">Azure IoT Central <FontIcon iconName='Forward' className='arrow-icon' /></a>
         {defaultRender!(props)}
       </div>
     ),
@@ -60,7 +63,7 @@ function Shell() {
       onDismiss={() => { showWaffle(false) }}
       onRenderNavigationContent={onRenderNavigationContent}
     >
-      <h2>Waffle</h2>
+      <Waffle />
     </Panel>
     <FluentShell
       masthead={{

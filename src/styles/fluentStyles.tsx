@@ -1,4 +1,5 @@
 import { ITextFieldStyleProps, ITextFieldStyles } from '@fluentui/react/lib/TextField';
+import { IDropdownStyles } from '@fluentui/react/lib/Dropdown';
 
 // this is required to style Office Fabric
 export function getTextFieldStyles(props: ITextFieldStyleProps): Partial<ITextFieldStyles> {
@@ -16,3 +17,7 @@ export function getTextFieldStyles(props: ITextFieldStyleProps): Partial<ITextFi
         }]
     };
 }
+
+export const dropdownStyles: Partial<IDropdownStyles> = {
+    dropdown: { width: 300 },
+};

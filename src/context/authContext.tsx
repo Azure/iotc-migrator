@@ -104,6 +104,10 @@ export class AuthProvider extends React.Component {
                 loginAccount = res.account;
                 return getAccessTokenForScope(silent, this.msalInstance, Scopes.Central, loginAccount ? { account: loginAccount } : null);
             })
+            .then((res: any) => {
+                loginAccount = res.account;
+                return getAccessTokenForScope(silent, this.msalInstance, Scopes.ARM, loginAccount ? { account: loginAccount } : null);
+            })
             .then(() => {
                 this.setState({
                     loginAccount,

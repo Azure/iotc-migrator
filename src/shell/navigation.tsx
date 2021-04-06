@@ -10,7 +10,7 @@ export function Navigation() {
     return (
         <>
             <NavItem to={Paths.new.index} exact title='View saved queries' icon='TurnRight' text='New migration' />
-            <NavItem to={Paths.status.index} exact title='Build a query and pin to the dashboard' icon='SyncStatus' text='Migration status' />
+            <NavItem to={Paths.status.index} exact title='Build a query and pin to the dashboard' icon='Sync' text='Migration status' />
         </>
     );
 }

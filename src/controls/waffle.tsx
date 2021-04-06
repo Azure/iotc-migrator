@@ -4,7 +4,7 @@ import { FontIcon } from '@fluentui/react/lib/Icon';
 
 function Waffle() {
 
-    const [apps, setApps] = React.useState([
+    const [apps,] = React.useState([
         {
             icon: 'TurnRight',
             name: 'Migrator',
@@ -27,12 +27,16 @@ function Waffle() {
         }
     ])
 
+    const redirect = (url: string) => {
+        window.location.href = url;
+    }
+
     return <div className='waffle'>
         <div className='waffle-apps'>
             <h1>Tools</h1>
             <div className='waffle-apps-tiles'>
                 {apps && apps.map((element: any) => {
-                    return <button className='waffle-apps-tile'>
+                    return <button title={element.url} className='waffle-apps-tile' onClick={() => redirect(element.url)}>
                         <div><FontIcon iconName={element.icon} className='arrow-icon' /></div>
                         <div>{element.name}</div>
                     </button>

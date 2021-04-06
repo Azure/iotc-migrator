@@ -2,3 +2,10 @@
   padding-left: 1rem;
   text-align: left;
 }
+
+.row {
+  padding-top: 0.2rem;
+  font-size: 0.9rem;
+  height: 2.6rem;
+  border-bottom: 1px solid #f4f3f2;
+}

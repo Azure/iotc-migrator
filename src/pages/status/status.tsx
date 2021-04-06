@@ -1,10 +1,11 @@
 import './status.css';
 
 import React from 'react';
-import { DetailsList, ConstrainMode, SelectionMode } from '@fluentui/react/lib/DetailsList'
+import { DetailsList, DetailsRow, ConstrainMode, SelectionMode } from '@fluentui/react/lib/DetailsList'
+import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 
 function Status() {
-  const [tableData, setTableData] = React.useState({
+  const [tableData,] = React.useState({
     cols: [
       { key: '1', name: 'Name', fieldName: 'name', isResizable: true, minWidth: 100 },
       { key: '2', name: 'Device group', fieldName: 'dgroup', isResizable: true, minWidth: 150 },
@@ -13,7 +14,7 @@ function Status() {
       { key: '5', name: 'Total devices', fieldName: 'totalDevices', isResizable: true, minWidth: 150 },
       { key: '6', name: 'Migrated devices', fieldName: 'migratedDevices', isResizable: true, minWidth: 150 },
       { key: '7', name: 'Start date', fieldName: 'startDate', isResizable: true, minWidth: 200 },
-      { key: '8', name: 'End data', fieldName: 'endDate', isResizable: true, minWidth: 200 },
+      { key: '8', name: 'End date', fieldName: 'endDate', isResizable: true, minWidth: 200 },
     ],
     rows: [
       { key: '1', name: 'Migration 1', dgroup: 'Group One', target: 'DPS 1', status: 'Completed', totalDevices: '1,000,000', migratedDevices: '500', startDate: '4/28/2020, 1:52:35 PM', endDate: '4/28/2020, 1:52:35 PM' },
@@ -22,8 +23,26 @@ function Status() {
     ]
   });
 
+  const cmdBar: ICommandBarItemProps[] = React.useMemo(() => [{
+    key: '1',
+    text: 'Refresh',
+    iconProps: {
+      iconName: 'Refresh'
+    },
+    onClick: () => { },
+    disabled: false
+  }], []);
+
+  const _onRenderRow = (props: any) => {
+    if (!props) { return null; }
+    return <DetailsRow {...props} className='row' />;
+  };
+
   return (
     <div className="workspace">
+      <div className='workspace-container'>
+        <CommandBar items={cmdBar} />
+      </div>
       <div className="workspace-title">
         <h1>Migration status</h1>
         <p>App 1 migration status.</p>
@@ -36,6 +55,7 @@ function Status() {
             columns={tableData.cols}
             selectionMode={SelectionMode.none}
             constrainMode={ConstrainMode.unconstrained}
+            onRenderRow={_onRenderRow}
             setKey="set"
           />
         </div>

@@ -8,10 +8,7 @@ export function getTextFieldStyles(props: ITextFieldStyleProps): Partial<ITextFi
             border: (props.focused ? '1px solid #136bfb' : '1px solid #cdcdcd'),
             selectors: {
                 ":hover": {
-                    borderColor: '#136bfb',
-                },
-                ":focused": {
-                    border: '1px',
+                    border: '1px solid #136bfb',
                 }
             }
         }]
@@ -19,5 +16,7 @@ export function getTextFieldStyles(props: ITextFieldStyleProps): Partial<ITextFi
 }
 
 export const dropdownStyles: Partial<IDropdownStyles> = {
-    dropdown: { width: 300 },
+    dropdown: {
+        width: 300,
+    },
 };

@@ -17,7 +17,7 @@ code {
 }
 
 .workspace-title {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   margin-left: 2rem;
   flex-shrink: 0;
   padding-right: 2rem;
@@ -43,4 +43,9 @@ code {
 h1 {
   font-weight: 600 !important;
   font-size: 1.7rem !important;
+}
+
+.workspace-container {
+    width: 100%;
+    border-bottom: 1px solid #dadada;
 }

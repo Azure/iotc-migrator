@@ -6,6 +6,7 @@ import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup
 import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { Checkbox } from '@fluentui/react/lib/Checkbox';
 import { PrimaryButton } from '@fluentui/react';
+import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 
 import { getTextFieldStyles, dropdownStyles } from '../../styles/fluentStyles';
 
@@ -38,8 +39,21 @@ function NewMigration() {
     setAppCopy(item?.key || '1');
   }
 
+  const cmdBar: ICommandBarItemProps[] = React.useMemo(() => [{
+    key: '1',
+    text: 'Migrate',
+    iconProps: {
+      iconName: 'TurnRight'
+    },
+    onClick: () => { },
+    disabled: false
+  }], []);
+
   return (
     <div className="workspace">
+      <div className='workspace-container'>
+        <CommandBar items={cmdBar} />
+      </div>
       <div className="workspace-title">
         <h1>New migration</h1>
         <p>Move devices from App 1 to another Azure IoT Central application or to your own Azure IoT Hub.</p>
@@ -48,7 +62,7 @@ function NewMigration() {
         <div className="workspace-narrow">
           <div className='field-group'>
             <div className='text-field'>
-              <TextField styles={getTextFieldStyles} label="Name" name='name' value='' onChange={() => { }} required={true} />
+              <TextField autoComplete='off' styles={getTextFieldStyles} label="Name" name='name' value='' onChange={() => { }} required={true} />
             </div>
           </div>
           <div className='field-group'>

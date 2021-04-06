@@ -67,7 +67,7 @@ function Shell() {
     </Panel>
     <FluentShell
       masthead={{
-        branding: "Migrator" + (authContext.applicationHost !== '' ? 'for application - ' + authContext.applicationHost : ''),
+        branding: 'Migrator ' + (authContext.applicationHost !== '' ? 'for application - ' + authContext.applicationHost : ''),
         user: signOut(authContext.signOut),
         waffle: waffleDOM(showWaffle, true)
       }}

@@ -1,24 +1,24 @@
 .inline-message {
     margin-top: 1rem;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     font-size: 0.8rem;
 
     i {
-        font-size: 1rem;
+        font-size: 0.9rem;
         margin-right: 0.25rem;
     }
 }
 
 .inline-message-info {
-    color: green;
+    color: #0b6a0b;
 }
 
 .inline-message-warning {
-    color: orange;
+    color: #ca5010;
 }
 
 .inline-message-error {
-    color: red;
+    color: #a4262c;
 }

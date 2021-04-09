@@ -6,6 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 import Shell from './shell/shell';
 import { AuthProvider } from './context/authContext';
+import { AppDataProvider } from './context/appDataContext';
 
 import { initializeIcons } from '@fluentui/react/lib/Icons';
 initializeIcons();
@@ -14,7 +15,9 @@ ReactDOM.render(
   <React.StrictMode>
     <Router>
       <AuthProvider>
-        <Shell />
+        <AppDataProvider>
+          <Shell />
+        </AppDataProvider>
       </AuthProvider>
     </Router>
 

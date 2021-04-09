@@ -18,6 +18,8 @@ import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { getTextFieldStyles, dropdownStyles } from '../../styles/fluentStyles';
 import usePromise from '../../hooks/usePromise';
 import { AuthContext } from '../../context/authContext';
+import { AppDataContext } from '../../context/appDataContext';
+
 import { InlineMessage } from '../../controls/inlineMessage';
 
 /* Core */
@@ -35,6 +37,7 @@ function postJob(authContext: any, payload: any) {
     axios.put(`https://${authContext.applicationHost}/api/preview/jobs/${uuid()}`,
       {
         'displayName': payload.migrationName,
+        'description': 'AUTOMATED-DEVICE-MOVE',
         'group': payload.group,
         'data': [
           {
@@ -48,48 +51,6 @@ function postJob(authContext: any, payload: any) {
       { headers: { 'Authorization': 'Bearer ' + token } })
       .then((res: any) => {
         resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  })
-}
-
-function getTemplates(authContext: any) {
-  return new Promise(async (resolve, reject) => {
-    const token = await authContext.getAccessToken();
-    const groups: any = [];
-    axios(`https://${authContext.applicationHost}/api/preview/deviceTemplates`, { headers: { 'Authorization': 'Bearer ' + token } })
-      .then((res: any) => {
-        for (const i in res.data.value) {
-          const group = res.data.value[i];
-          groups.push({
-            key: group.id,
-            text: group.displayName
-          })
-        }
-        resolve(groups);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  })
-}
-
-function getGroups(authContext: any) {
-  return new Promise(async (resolve, reject) => {
-    const token = await authContext.getAccessToken();
-    const groups: any = [];
-    axios(`https://${authContext.applicationHost}/api/preview/deviceGroups`, { headers: { 'Authorization': 'Bearer ' + token } })
-      .then((res: any) => {
-        for (const i in res.data.value) {
-          const group = res.data.value[i];
-          groups.push({
-            key: group.id,
-            text: group.displayName
-          })
-        }
-        resolve(groups);
       })
       .catch((err) => {
         reject(err);
@@ -181,6 +142,7 @@ function NewMigration() {
 
   const formRef = React.useRef<any>(null);
   const authContext: any = React.useContext(AuthContext);
+  const appDataContext: any = React.useContext(AppDataContext);
 
   const { control, register, handleSubmit, watch } = useForm();
   const optionWatch = watch('migrationOption', undefined);
@@ -222,11 +184,19 @@ function NewMigration() {
   }], []);
 
   // initial mount render only
-  React.useEffect(() => {
-    if (!authContext.authenticated) { return; }
-    fetchGroups({ promiseFn: () => getGroups(authContext) });
-    fetchTemplates({ promiseFn: () => getTemplates(authContext) });
-  }, [authContext])
+  const appData = React.useMemo(() => {
+    const groups: any = [];
+    for (const key in appDataContext.groups) {
+      groups.push({ key: key, text: appDataContext.groups[key] })
+    }
+
+    const templates: any = [];
+    for (const key in appDataContext.templates) {
+      templates.push({ key: key, text: appDataContext.templates[key] })
+    }
+
+    return { templates, groups }
+  }, [])
 
   // when option changes, change the target id
   React.useEffect(() => {
@@ -286,7 +256,7 @@ function NewMigration() {
                     onChange={(e: any, v: any) => { field.onChange(v.key) }} required={true}
                     placeholder='Select a device group'
                     label='Device group'
-                    options={groupsList || []}
+                    options={appData.groups || []}
                     styles={dropdownStyles}
                   />
                 }
@@ -303,7 +273,7 @@ function NewMigration() {
                     onChange={(e: any, v: any) => { field.onChange(v.key) }} required={true}
                     placeholder='Select a device template'
                     label='Filter group by device template'
-                    options={templatesList || []}
+                    options={appData.templates || []}
                     styles={dropdownStyles}
                   />
                 }

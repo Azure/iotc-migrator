@@ -6,6 +6,7 @@ import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar
 import axios from 'axios';
 import usePromise from '../../hooks/usePromise';
 import { AuthContext } from '../../context/authContext';
+import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
 
 function getJobs(authContext: any) {
   return new Promise(async (resolve, reject) => {
@@ -63,7 +64,8 @@ function Status() {
     let timer: any = null;
     timer = setInterval(() => {
       fetch({ promiseFn: () => getJobs(authContext) });
-    }, 5000);
+    }, 10000);
+    fetch({ promiseFn: () => getJobs(authContext) });
     return () => {
       clearInterval(timer);
     }
@@ -83,8 +85,10 @@ function Status() {
         <h1>Migration status</h1>
         <p>App 1 migration status.</p>
       </div>
+
       <div className="workspace-content">
-        <div className="workspace-table">
+        {loading ? <div className='status-progress'><ProgressIndicator /></div> : null}
+        <div className={"workspace-table " + (loading ? '' : 'status-padding')}>
           <DetailsList
             compact={true}
             items={tableData.rows}

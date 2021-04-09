@@ -13,7 +13,7 @@ import { Checkbox } from '@fluentui/react/lib/Checkbox';
 import { PrimaryButton, MessageBarButton } from '@fluentui/react';
 import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
-
+import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
 
 import { getTextFieldStyles, dropdownStyles } from '../../styles/fluentStyles';
 import usePromise from '../../hooks/usePromise';
@@ -295,6 +295,7 @@ function NewMigration() {
                     required={true}
                   />}
               />
+              {optionWatch && loadingTargets ? <ProgressIndicator /> : null}
             </div>
 
             {optionWatch === undefined ? null : <>

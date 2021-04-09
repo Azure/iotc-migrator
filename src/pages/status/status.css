@@ -9,3 +9,11 @@
   height: 2.6rem;
   border-bottom: 1px solid #f4f3f2;
 }
+
+.status-progress {
+  padding: 0 2rem;
+}
+
+.status-padding {
+  margin-top: 1rem;
+}

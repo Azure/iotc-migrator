@@ -30,6 +30,10 @@ code {
   padding-bottom: 2rem;
 }
 
+.workspace-content-smallpad {
+  padding-bottom: 1rem;
+}
+
 .workspace-narrow {
   margin-left: 2rem;
   max-width: 600px;

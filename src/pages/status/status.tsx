@@ -1,11 +1,12 @@
 import './status.css';
 
 import React from 'react';
-import { DetailsList, DetailsRow, ConstrainMode, SelectionMode } from '@fluentui/react/lib/DetailsList'
+import { DetailsList, DetailsRow, ConstrainMode, SelectionMode, IColumn } from '@fluentui/react/lib/DetailsList'
 import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import axios from 'axios';
 import usePromise from '../../hooks/usePromise';
 import { AuthContext } from '../../context/authContext';
+import { AppDataContext } from '../../context/appDataContext';
 import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
 
 function getJobs(authContext: any) {
@@ -20,6 +21,7 @@ function getJobs(authContext: any) {
           if (job.description && job.description.startsWith('AUTOMATED-DEVICE-MOVE')) {
             rows.push({
               key: i,
+              id: job.id,
               name: job.displayName,
               dgroup: job.group,
               status: job.status
@@ -27,7 +29,7 @@ function getJobs(authContext: any) {
           }
         }
         const cols = [
-          { key: '1', name: 'Name', fieldName: 'name', isResizable: true, minWidth: 100 },
+          { key: '1', name: 'Migration job name', fieldName: 'id', isResizable: true, minWidth: 150 },
           { key: '2', name: 'Device group', fieldName: 'dgroup', isResizable: true, minWidth: 150 },
           { key: '3', name: 'Status', fieldName: 'status', isResizable: true, minWidth: 150 }
         ]
@@ -41,6 +43,7 @@ function getJobs(authContext: any) {
 
 function Status() {
   const authContext: any = React.useContext(AuthContext);
+  const appDataContext: any = React.useContext(AppDataContext);
 
   const [tableData, setTableData] = React.useState({ cols: [], rows: [] });
   const [loading, data, error, fetch] = usePromise();
@@ -54,11 +57,6 @@ function Status() {
     onClick: () => { fetch({ promiseFn: () => getJobs(authContext) }); },
     disabled: false
   }], []);
-
-  const _onRenderRow = (props: any) => {
-    if (!props) { return null; }
-    return <DetailsRow {...props} className='row' />;
-  };
 
   React.useEffect(() => {
     let timer: any = null;
@@ -76,6 +74,23 @@ function Status() {
     setTableData(data);
   }, [data])
 
+
+  const _onRenderRow = (props: any) => {
+    if (!props) { return null; }
+    return <DetailsRow {...props} className='row' />;
+  };
+
+  const _onRenderItemColumn = (item: any, index: any, column: any) => {
+    const node = null;
+    if (column.fieldName === 'dgroup') {
+      return <a target='_blank' href={`https://${authContext.applicationHost}.azureiotcentral.com/device-groups/${item[column.fieldName]}`}>{appDataContext.groups[item[column.fieldName]]}</a>;
+    } else if (column.fieldName === 'id') {
+      return <a target='_blank' href={`https://${authContext.applicationHost}.azureiotcentral.com/jobs/instances/${item[column.fieldName]}`}>{item['name']}</a>;
+    } else {
+      return <span>{item[column.fieldName]}</span>;
+    }
+  }
+
   return (
     <div className="workspace">
       <div className='workspace-container'>
@@ -83,7 +98,7 @@ function Status() {
       </div>
       <div className="workspace-title">
         <h1>Migration status</h1>
-        <p>App 1 migration status.</p>
+        <p>{authContext.applicationHost} migration status.</p>
       </div>
 
       <div className="workspace-content">
@@ -96,6 +111,7 @@ function Status() {
             selectionMode={SelectionMode.none}
             constrainMode={ConstrainMode.unconstrained}
             onRenderRow={_onRenderRow}
+            onRenderItemColumn={_onRenderItemColumn}
             setKey="set"
           />
         </div>

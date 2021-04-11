@@ -10,7 +10,7 @@ import { TextField } from '@fluentui/react/lib/TextField';
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
 import { Dropdown } from '@fluentui/react/lib/Dropdown';
 import { Checkbox } from '@fluentui/react/lib/Checkbox';
-import { PrimaryButton, MessageBarButton } from '@fluentui/react';
+import { PrimaryButton } from '@fluentui/react';
 import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
@@ -129,13 +129,6 @@ const options: IChoiceGroupOption[] = [
   { key: MigrationOptions.App, text: 'Move to another Azure IoT Central application' }
 ];
 
-const DeviceCount = (count: number) => {
-  return <div className='device-count'>
-    <span>{count}</span>
-    <span>groups</span>
-  </div>
-}
-
 /* Render */
 
 function NewMigration() {
@@ -146,11 +139,8 @@ function NewMigration() {
 
   const { control, register, handleSubmit, watch } = useForm();
   const optionWatch = watch('migrationOption', undefined);
-  const targetWatch = watch('target', undefined);
 
   const [loadingTargets, targetsList, fetchTargetsError, fetchTargets] = usePromise();
-  const [, templatesList, fetchTemplatesError, fetchTemplates] = usePromise();
-  const [, groupsList, fetchGroupsError, fetchGroups] = usePromise();
   const [submittingJob, jobResult, submitError, createJob] = usePromise();
 
   const pageDisabled = !submittingJob && jobResult;
@@ -171,6 +161,7 @@ function NewMigration() {
     },
     onClick: cmdSubmit,
     disabled: !submittingJob && jobResult
+    // eslint-disable-next-line
   }], []);
 
   const cmdBarNew: ICommandBarItemProps[] = React.useMemo(() => [{
@@ -181,6 +172,7 @@ function NewMigration() {
     },
     onClick: cmdSubmit,
     disabled: !submittingJob && jobResult
+    // eslint-disable-next-line
   }], []);
 
   // initial mount render only
@@ -196,6 +188,7 @@ function NewMigration() {
     }
 
     return { templates, groups }
+    // eslint-disable-next-line
   }, [])
 
   // when option changes, change the target id
@@ -203,9 +196,10 @@ function NewMigration() {
     if (!authContext.authenticated && (authContext.authenticated && optionWatch === undefined)) { return; }
     if (optionWatch === MigrationOptions.App) { fetchTargets({ promiseFn: () => getSubscriptionsApps(authContext) }); }
     if (optionWatch === MigrationOptions.Hub) { fetchTargets({ promiseFn: () => getDPS(authContext) }); }
+    // eslint-disable-next-line
   }, [authContext, optionWatch])
 
-  const error = submitError || fetchGroupsError || fetchTemplatesError || fetchTargetsError || null;
+  const error = submitError || fetchTargetsError || null;
 
   return (
     <div className='workspace'>

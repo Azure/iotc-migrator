@@ -1,7 +1,7 @@
 import './status.css';
 
 import React from 'react';
-import { DetailsList, DetailsRow, ConstrainMode, SelectionMode, IColumn } from '@fluentui/react/lib/DetailsList'
+import { DetailsList, DetailsRow, ConstrainMode, SelectionMode } from '@fluentui/react/lib/DetailsList'
 import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import axios from 'axios';
 import usePromise from '../../hooks/usePromise';
@@ -12,7 +12,6 @@ import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
 function getJobs(authContext: any) {
   return new Promise(async (resolve, reject) => {
     const token = await authContext.getAccessToken();
-    const groups: any = [];
     axios(`https://${authContext.applicationHost}/api/preview/jobs`, { headers: { 'Authorization': 'Bearer ' + token } })
       .then((res: any) => {
         const rows: any = [];
@@ -46,7 +45,7 @@ function Status() {
   const appDataContext: any = React.useContext(AppDataContext);
 
   const [tableData, setTableData] = React.useState({ cols: [], rows: [] });
-  const [loading, data, error, fetch] = usePromise();
+  const [loading, data, , fetch] = usePromise();
 
   const cmdBar: ICommandBarItemProps[] = React.useMemo(() => [{
     key: '1',
@@ -56,6 +55,7 @@ function Status() {
     },
     onClick: () => { fetch({ promiseFn: () => getJobs(authContext) }); },
     disabled: false
+    // eslint-disable-next-line
   }], []);
 
   React.useEffect(() => {
@@ -67,6 +67,7 @@ function Status() {
     return () => {
       clearInterval(timer);
     }
+    // eslint-disable-next-line
   }, [])
 
   React.useEffect(() => {
@@ -81,29 +82,28 @@ function Status() {
   };
 
   const _onRenderItemColumn = (item: any, index: any, column: any) => {
-    const node = null;
     if (column.fieldName === 'dgroup') {
-      return <a target='_blank' href={`https://${authContext.applicationHost}.azureiotcentral.com/device-groups/${item[column.fieldName]}`}>{appDataContext.groups[item[column.fieldName]]}</a>;
+      return <a target='_blank' rel='noreferrer' href={`https://${authContext.applicationHost}/device-groups/${item[column.fieldName]}`}>{appDataContext.groups[item[column.fieldName]]}</a>;
     } else if (column.fieldName === 'id') {
-      return <a target='_blank' href={`https://${authContext.applicationHost}.azureiotcentral.com/jobs/instances/${item[column.fieldName]}`}>{item['name']}</a>;
+      return <a target='_blank' rel='noreferrer' href={`https://${authContext.applicationHost}/jobs/instances/${item[column.fieldName]}`}>{item['name']}</a>;
     } else {
       return <span>{item[column.fieldName]}</span>;
     }
   }
 
   return (
-    <div className="workspace">
+    <div className='workspace'>
       <div className='workspace-container'>
         <CommandBar items={cmdBar} />
       </div>
-      <div className="workspace-title">
+      <div className='workspace-title'>
         <h1>Migration status</h1>
         <p>{authContext.applicationHost} migration status.</p>
       </div>
 
-      <div className="workspace-content">
+      <div className='workspace-content'>
         {loading ? <div className='status-progress'><ProgressIndicator /></div> : null}
-        <div className={"workspace-table " + (loading ? '' : 'status-padding')}>
+        <div className={'workspace-table ' + (loading ? '' : 'status-padding')}>
           <DetailsList
             compact={true}
             items={tableData.rows}
@@ -112,7 +112,7 @@ function Status() {
             constrainMode={ConstrainMode.unconstrained}
             onRenderRow={_onRenderRow}
             onRenderItemColumn={_onRenderItemColumn}
-            setKey="set"
+            setKey='set'
           />
         </div>
       </div>

@@ -47,6 +47,7 @@ function Shell() {
     if (authContext.authenticated) {
       appDataContext.fetchAppData(authContext);
     }
+    // eslint-disable-next-line
   }, [authContext, appDataContext.fetchAppData, authContext.authenticated]);
 
   const onRenderNavigationContent: IRenderFunction<IPanelProps> = React.useCallback(

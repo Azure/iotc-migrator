@@ -5,10 +5,6 @@ export const AppDataContext = React.createContext({});
 
 export class AppDataProvider extends React.Component {
 
-    constructor(props: any) {
-        super(props)
-    }
-
     // turns the results array into an associative array with the id as key. Used for look ups
     getDeviceGroups = async (authContext: any) => {
         const groups = {};
@@ -25,6 +21,7 @@ export class AppDataProvider extends React.Component {
         return templates;
     }
 
+    // this works because its single app
     fetchAppData = async (authContext: any) => {
         const groups = await this.getDeviceGroups(authContext);
         const templates = await this.getTemplates(authContext);

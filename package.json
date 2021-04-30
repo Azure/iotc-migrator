@@ -2,6 +2,7 @@
   "name": "iotc-migrator",
   "version": "0.1.0",
   "private": true,
+  "main": "./server.js",
   "dependencies": {
     "@azure/msal-browser": "^2.13.1",
     "@fluentui/react": "^8.8.0",
@@ -22,8 +23,12 @@
     "uuidv4": "^6.2.7"
   },
   "scripts": {
-    "start": "cross-env PORT=4006 react-scripts start",
-    "build": "react-scripts build"
+    "start": "node server.js",
+    "start-cra": "cross-env PORT=4006 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "watch": "cra-build-watch"
   },
   "eslintConfig": {
     "extends": [

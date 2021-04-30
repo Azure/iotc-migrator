@@ -65,6 +65,9 @@ function getDPS(authContext: any) {
     axios.get(`https://management.azure.com/subscriptions?api-version=2020-01-01`, { headers: { Authorization: 'Bearer ' + armToken } })
       .then((res: any) => {
         const subs = res.data.value;
+        if (!subs || subs.length === 0) {
+          resolve(apps);
+        }
         for (const i in subs) {
           const sub = subs[i];
           axios.get(`https://management.azure.com/subscriptions/${sub.subscriptionId}/providers/Microsoft.Devices/provisioningServices?api-version=2018-01-22`, { headers: { Authorization: 'Bearer ' + armToken } })
@@ -97,6 +100,9 @@ function getSubscriptionsApps(authContext: any) {
     axios.get(`https://management.azure.com/subscriptions?api-version=2020-01-01`, { headers: { Authorization: 'Bearer ' + armToken } })
       .then((res: any) => {
         const subs = res.data.value;
+        if (!subs || subs.length === 0) {
+          resolve(apps);
+        }
         for (const i in subs) {
           const sub = subs[i];
           axios.get(`https://management.azure.com/subscriptions/${sub.subscriptionId}/providers/Microsoft.IoTCentral/IoTApps?api-version=2018-09-01`, { headers: { Authorization: 'Bearer ' + armToken } })

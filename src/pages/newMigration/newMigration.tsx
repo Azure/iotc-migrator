@@ -303,7 +303,8 @@ function NewMigration() {
                 <h2>Migration target</h2>
 
                 {optionWatch === MigrationOptions.App ? <>
-                  <p>Choose the target application where the devices will be moved.</p>
+                  <p className={"no-margin-bottom"}>Choose the target application where the devices will be moved.</p>
+                  <p>You can set the same group SAS tokens in both IoT Hub and IoT Central so that your devices can connect to either solutions.</p>
                   <Controller
                     control={control}
                     name='target'
@@ -322,7 +323,8 @@ function NewMigration() {
                 </> : null}
 
                 {optionWatch === MigrationOptions.Hub ? <>
-                  <p>Choose the Device Provisioning Service (DPS) linked to an Azure IoT Hub where the devices will be moved.</p>
+                  <p className={"no-margin-bottom"}>Choose the Device Provisioning Service (DPS) linked to an Azure IoT Hub where the devices will be moved.</p>
+                  <p>You can set the same group SAS tokens in both IoT Hub and IoT Central so that your devices can connect to either solutions.</p>
                   <Controller
                     control={control}
                     name='target'

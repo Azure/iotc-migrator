@@ -8,8 +8,6 @@ export interface AppConfig {
     applicationHost: string;
 }
 
-const KEY = 'MigratorApp'
-
 function getAccessTokenForScope(silentFail: boolean, msalInstance: any, scope: string, options: any) {
     const tokenRequest: any = Object.assign({}, options, {
         scopes: Array.isArray(scope) ? scope : [scope],
@@ -74,17 +72,14 @@ export class AuthProvider extends React.Component {
 
     constructor(props: any) {
         super(props);
-        const cache: any = localStorage.getItem(KEY);
-        if (cache !== null && cache !== '') {
-            const c: AppConfig = JSON.parse(cache);
-            this.state.applicationId = c.applicationId;
-            this.state.directoryId = c.directoryId;
-            this.state.applicationHost = c.applicationHost;
-        } else {
-            this.state.applicationId = Config.AADClientID;
-            this.state.directoryId = Config.AADDirectoryID;
-            this.state.applicationHost = Config.applicationHost;
-        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const applicationHost = urlParams && urlParams.get('appHost') ? urlParams.get('appHost') : null;
+
+        this.state.applicationId = Config.AADClientID;
+        this.state.directoryId = Config.AADDirectoryID;
+        this.state.applicationHost = applicationHost || Config.applicationHost;
+
         msalConfig.auth.clientId = this.state.applicationId;
         msalConfig.auth.authority = Config.AADLoginServer + '/' + this.state.directoryId;
         this.msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -103,6 +98,10 @@ export class AuthProvider extends React.Component {
             .then((res: any) => {
                 loginAccount = res.account;
                 return getAccessTokenForScope(silent, this.msalInstance, Scopes.Central, loginAccount ? { account: loginAccount } : null);
+            })
+            .then((res: any) => {
+                loginAccount = res.account;
+                return getAccessTokenForScope(silent, this.msalInstance, Scopes.ARM, loginAccount ? { account: loginAccount } : null);
             })
             .then(() => {
                 this.setState({
@@ -131,16 +130,6 @@ export class AuthProvider extends React.Component {
         this.msalInstance.logout();
     }
 
-    resetApplication = (payload: any) => {
-        localStorage.setItem(KEY, JSON.stringify(payload));
-        window.location.href = '/';
-    }
-
-    clearApplication = () => {
-        localStorage.removeItem(KEY);
-        window.location.href = '/';
-    }
-
     state: any = {
         authenticated: false,
         applicationId: '',
@@ -150,9 +139,7 @@ export class AuthProvider extends React.Component {
         signIn: this.signIn,
         signOut: this.signOut,
         getAccessToken: this.getAccessToken,
-        getArmAccessToken: this.getArmAccessToken,
-        resetApplication: this.resetApplication,
-        clearApplication: this.clearApplication
+        getArmAccessToken: this.getArmAccessToken
     }
 
     render() {

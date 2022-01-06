@@ -3,12 +3,15 @@ import './shell.scss';
 import React from 'react';
 
 import { AuthContext } from '../context/authContext';
+import { AppDataContext } from '../context/appDataContext';
+
 import { Shell as FluentShell, NavigationProperties } from '@microsoft/azure-iot-ux-fluent-controls/lib/components/Shell';
 import { Navigation } from './navigation';
 import { Routes } from './routes';
 import { Panel, PanelType, IPanelProps } from '@fluentui/react/lib/Panel';
 import { IRenderFunction } from '@fluentui/react/lib/Utilities';
 import { FontIcon } from '@fluentui/react/lib/Icon';
+import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
 
 import Waffle from '../controls/waffle';
 
@@ -26,6 +29,8 @@ function waffleDOM(showWaffle: any, value: boolean) {
 
 function Shell() {
   const authContext: any = React.useContext(AuthContext);
+  const appDataContext: any = React.useContext(AppDataContext);
+
   const [expanded, setExpanded] = React.useState(true);
   const [waffle, showWaffle] = React.useState<boolean>(false);
 
@@ -36,10 +41,14 @@ function Shell() {
   }
 
   React.useEffect(() => {
-    if (!authContext.authenticated && authContext.directoryId !== '') {
+    if (!authContext.authenticated) {
       authContext.signIn();
     }
-  }, [authContext, authContext.authenticated]);
+    if (authContext.authenticated) {
+      appDataContext.fetchAppData(authContext);
+    }
+    // eslint-disable-next-line
+  }, [authContext, appDataContext.fetchAppData, authContext.authenticated]);
 
   const onRenderNavigationContent: IRenderFunction<IPanelProps> = React.useCallback(
     (props, defaultRender) => (
@@ -72,8 +81,15 @@ function Shell() {
         waffle: waffleDOM(showWaffle, true)
       }}
       navigation={nav}>
-      <Routes application={`http://${authContext.applicationHost}`} />
-      {authContext.authenticated ? null : <div className='no-auth'>Not authenticated</div>}
+
+      {authContext.authenticated && appDataContext.initialized ?
+        <Routes application={`http://${authContext.applicationHost}`} />
+        :
+        <div className="shell-initial">
+          <h2>Please wait</h2>
+          <ProgressIndicator label="Waiting for authentication and application data fetch" />
+        </div>
+      }
     </FluentShell>
   </div >
 }

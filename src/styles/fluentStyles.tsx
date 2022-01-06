@@ -17,6 +17,6 @@ export function getTextFieldStyles(props: ITextFieldStyleProps): Partial<ITextFi
 
 export const dropdownStyles: Partial<IDropdownStyles> = {
     dropdown: {
-        width: 300,
+        width: 400,
     },
 };

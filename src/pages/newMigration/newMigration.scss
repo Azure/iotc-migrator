@@ -1,0 +1,18 @@
+.device-count {
+  > span:nth-child(1) {
+    font-weight: 1000;
+    margin-right: 0.25rem;
+  }
+}
+
+.field-group:not(:first-child) {
+  margin-top: 3rem;
+}
+
+.loading {
+  opacity: 0.2;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0;
+}

@@ -1,21 +1,23 @@
-import { Switch, Route } from 'react-router-dom';
+import { Routes as ReactRoutes, Route, } from 'react-router-dom';
 import NewMigration from '../pages/newMigration/newMigration';
 import Status from '../pages/status/status';
+import Shell from './shell';
 
 export const Paths = {
-    new: {
-        index: '/',
-    },
-    status: {
-        index: '/status',
-    }
+    home: '/',
+    status: '/status',
 };
 
-export function Routes({ application }: { application: string }) {
+export function Routes({ appReady }: { appReady: boolean }) {
+
     return (
-        <Switch>
-            <Route exact path={Paths.new.index} component={NewMigration} />
-            <Route path={Paths.status.index} component={Status} />
-        </Switch>
+        <ReactRoutes>
+            <Route path={Paths.home} element={appReady ? <NewMigration /> : <Shell />} />
+            <Route path={Paths.status} element={appReady ? <Status /> : <Shell />} />
+            <Route
+                path="*"
+                element={<Route path={Paths.home} element={<Shell />} />}
+            />
+        </ReactRoutes>
     );
 }

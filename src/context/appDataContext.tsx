@@ -1,45 +1,74 @@
 import * as React from 'react';
-import * as API from '../api';
+import * as IotcAPI from '../iotcAPI';
+import { AuthContextInterface } from './authContext';
 
-export const AppDataContext = React.createContext({});
 
-export class AppDataProvider extends React.Component {
+export interface AppDataContextInterface {
+    appDataReady: boolean;
+    groups: {key: string, text: string}[];
+    templates: {key: string, text: string}[];
+    fetchAppData: (authContext: AuthContextInterface) => Promise<void>;
+    error: any;
+}
+
+export const AppDataContext = React.createContext<AppDataContextInterface>({} as AppDataContextInterface);
+
+export function AppDataProvider({ children }: { children: any }) {
 
     // turns the results array into an associative array with the id as key. Used for look ups
-    getDeviceGroups = async (authContext: any) => {
-        const groups = {};
-        const res: any = await API.getGroups(authContext);
-        for (const i in res) { groups[res[i].id] = res[i].displayName }
-        return groups;
+    const getDeviceGroups = async (authContext: AuthContextInterface) => {
+        const res = await IotcAPI.getGroups(authContext);
+        return res.map(x => {
+            return {
+                key: x.id,
+                text: x.displayName
+            }; 
+        });
     }
 
     // turns the results array into an associative array with the id as key. Used for look ups
-    getTemplates = async (authContext: any) => {
-        const templates = {};
-        const res: any = await API.getTemplates(authContext);
-        for (const i in res) { templates[res[i].id] = res[i].displayName }
-        return templates;
+    const getTemplates = async (authContext: AuthContextInterface) => {
+        const res = await IotcAPI.getTemplates(authContext);
+        return res.map(x => {
+            return {
+                key: x.id,
+                text: x.displayName
+            }; 
+        });
     }
 
     // this works because its single app
-    fetchAppData = async (authContext: any) => {
-        const groups = await this.getDeviceGroups(authContext);
-        const templates = await this.getTemplates(authContext);
-        this.setState({ groups, templates, initialized: true });
+    const fetchAppData = async (authContext: AuthContextInterface) => {
+        try {
+            const groups = await getDeviceGroups(authContext);
+            const templates = await getTemplates(authContext);
+            setAppState({
+                ...appState,
+                groups: groups || [],
+                templates: templates || [],
+                appDataReady: true,
+                error: undefined
+            });
+        } catch (error) {
+            setAppState({
+                ...appState,
+                appDataReady: false,
+                error,
+            });
+        }
     }
 
-    state: any = {
-        initialized: false,
-        groups: {},
-        templates: {},
-        fetchAppData: this.fetchAppData
-    }
+    const [appState, setAppState] = React.useState<AppDataContextInterface>({
+        appDataReady: false,
+        groups: [],
+        templates: [],
+        fetchAppData,
+        error: undefined
+    });
 
-    render() {
-        return (
-            <AppDataContext.Provider value={this.state}>
-                {this.props.children}
-            </AppDataContext.Provider>
-        )
-    }
+    return (
+        <AppDataContext.Provider value={appState}>
+            {children}
+        </AppDataContext.Provider>
+    )
 }

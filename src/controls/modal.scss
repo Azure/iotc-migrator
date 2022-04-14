@@ -1,0 +1,14 @@
+.modal-content {
+    width: 600px;
+    padding: 20px;
+  }
+  
+  .modal-title-container {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+  }
+  
+  .modal-title {
+    flex-grow: 1;
+  }

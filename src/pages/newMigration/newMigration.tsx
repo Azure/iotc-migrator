@@ -14,11 +14,9 @@ import { getTextFieldStyles, dropdownStyles } from '../../styles/fluentStyles';
 import usePromise from '../../hooks/usePromise';
 import { AuthContext } from '../../context/authContext';
 import { AppDataContext } from '../../context/appDataContext';
-
-import { InlineMessage } from '../../controls/inlineMessage';
 import { getDPS, getSubscriptionsApps, JobPayload, postJob } from '../../iotcAPI';
 import { Config } from '../../config';
-import { useAsyncCallback } from '../../hooks/useAsync';
+
 const cx = classnames.bind(require('./newMigration.scss'));
 
 const enum MigrationOptions {
@@ -28,7 +26,7 @@ const enum MigrationOptions {
 
 const options: IChoiceGroupOption[] = [
   { key: MigrationOptions.Hub, text: 'Move to your own Azure IoT Hub' },
-  { key: MigrationOptions.App, text: 'Move to another Azure IoT Central application' }
+  { key: MigrationOptions.App, text: 'Move to another Azure IoT Central application', disabled: true }
 ];
 
 export default React.memo(function NewMigration() {
@@ -37,20 +35,21 @@ export default React.memo(function NewMigration() {
   const authContext = React.useContext(AuthContext);
   const appDataContext = React.useContext(AppDataContext);
 
-  const { control, register, handleSubmit, watch, getValues } = useForm<JobPayload>();
+  const { control, register, handleSubmit, watch } = useForm<JobPayload>();
   const optionWatch = watch('migrationOption', undefined);
 
   const [loadingTargets, targetsList, fetchTargetsError, fetchTargets] = usePromise();
   const [submittingJob, jobResult, submitError, createJob] = usePromise();
 
-  const pageDisabled = !submittingJob && jobResult;
+  const pageDisabled = !submittingJob && !!jobResult;
 
   const cmdSubmit = () => { formRef.current.click(); }
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data) => {
     createJob({ promiseFn: () => postJob(authContext, data) });
   }
-  // const [onCreateJob, submitJobLoading, submitJobError] = useCreateJob(getValues(), authContext);
+
+  const [error, setError] = React.useState<boolean>(false);
 
 
   const cmdBar: ICommandBarItemProps[] = React.useMemo(() => [{
@@ -60,18 +59,18 @@ export default React.memo(function NewMigration() {
       iconName: 'TurnRight'
     },
     onClick: cmdSubmit,
-    disabled: !submittingJob && jobResult
-  }], [jobResult, submittingJob]);
+    disabled: pageDisabled
+  }], [pageDisabled]);
 
   const cmdBarNew: ICommandBarItemProps[] = React.useMemo(() => [{
-    key: '1',
+    key: '2',
     text: 'New migration',
     iconProps: {
       iconName: 'Add'
     },
     onClick: cmdSubmit,
-    disabled: !submittingJob && jobResult
-  }], [jobResult, submittingJob]);
+    disabled: submittingJob
+  }], [submittingJob]);
 
   React.useEffect(() => {
     if (optionWatch === MigrationOptions.App) {
@@ -83,15 +82,25 @@ export default React.memo(function NewMigration() {
     // eslint-disable-next-line
   }, [authContext, optionWatch]);
 
-  const error = submitError || fetchTargetsError || null;
+  React.useEffect(() => {
+    if (submitError || fetchTargetsError) {
+      setError(true);
+    }
+    else {
+      setError(false);
+    }
+  }, [fetchTargetsError, submitError]);
+
+  const errorData = submitError || fetchTargetsError;
 
   return (
     <div className={cx('workspace')}>
-      <CommandBar className={cx('action-bar')} items={pageDisabled ? cmdBarNew : cmdBar} />
+      <CommandBar className={cx('action-bar')} items={!!pageDisabled ? cmdBarNew : cmdBar} />
       {error && <MessageBar
         messageBarType={MessageBarType.error}
-        isMultiline={true}>
-        <p>{JSON.stringify(error?.response?.data?.error?.message || error.message || 'Something went wrong. Please try again')}</p>
+        isMultiline={true}
+        onDismiss={() => setError(false)}>
+        <p>{JSON.stringify(errorData?.response?.data?.error?.message || errorData.message || 'Something went wrong. Please try again')}</p>
       </MessageBar>}
       {pageDisabled && <MessageBar
         messageBarType={MessageBarType.success}
@@ -103,7 +112,7 @@ export default React.memo(function NewMigration() {
       <div className={cx('workspace-container')}>
         <div className={cx('workspace-title')}>
           <h1 className={cx('title')}>New migration</h1>
-          <p>{`Move devices from ${Config.applicationHost} to another Azure IoT Central application or to your own Azure IoT Hub.`}</p>
+          <p>Move devices from <span className={cx('app-name')}>{Config.applicationHost}</span> to another Azure IoT Central application or to your own Azure IoT Hub.</p>
         </div>
         <div className={cx('workspace-content')}>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -112,6 +121,7 @@ export default React.memo(function NewMigration() {
               <div className={cx('field-group')}>
                 <div className={cx('text-field')}>
                   <TextField
+                    autoFocus
                     required={true}
                     disabled={pageDisabled}
                     autoComplete='off'
@@ -200,7 +210,9 @@ export default React.memo(function NewMigration() {
                           styles={dropdownStyles} />
                       }
                     />
-                    <InlineMessage message="Please ensure that the device group enrollment or X.509 authentication details are copied from the Central application to this DPS instance" type="warning" />
+                    <MessageBar className={cx('message-bar')} messageBarType={MessageBarType.warning}>
+                      Please ensure that the device group enrollment or X.509 authentication details are copied from the Central application to this DPS instance
+                    </MessageBar>
                   </>}
                 </div>
                 {optionWatch === MigrationOptions.App &&
@@ -246,16 +258,3 @@ export default React.memo(function NewMigration() {
     </div >
   );
 });
-
-function useCreateJob(data, authContext) {
-  return useAsyncCallback(async (signal) => {
-    try {
-      await postJob(authContext, data);
-    } catch (error) {
-      if (signal?.aborted) {
-        return;
-      }
-      throw error;
-    }
-  }, [authContext, data]);
-}

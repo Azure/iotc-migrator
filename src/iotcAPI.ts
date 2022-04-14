@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 import { AuthContextInterface, Scopes } from './context/authContext';
 
 interface IOTCentralResponse<T> {
@@ -66,14 +66,14 @@ export interface JobPayload {
 export async function postJob(authContext: AuthContextInterface, payload: JobPayload): Promise<Job> {
     try {
         const token = await authContext.getAccessToken(authContext.loginAccount, Scopes.Central);
-        const res: IOTCentralResponse<Job> = await axios.put(`https://${authContext.applicationHost}/api/jobs/${uuid()}?api-version=1.1-preview`,
+        const res: IOTCentralResponse<Job> = await axios.put(`https://${authContext.applicationHost}/api/jobs/${uuidv4()}?api-version=1.1-preview`,
             {
                 displayName: payload.migrationName,
                 description: 'AUTOMATED-DEVICE-MOVE',
                 group: payload.group,
                 data: [
                     {
-                        type: 'CommandJobData',
+                        type: 'command',
                         target: payload.template,
                         path: 'DeviceMove',
                         value: payload.target
@@ -82,7 +82,6 @@ export async function postJob(authContext: AuthContextInterface, payload: JobPay
             },
             { headers: { 'Authorization': 'Bearer ' + token } }
         );
-
         return res.data;
     } catch (error) {
         throw error;
@@ -97,13 +96,6 @@ export interface Row {
     status: string;
 }
 
-export interface Col {
-    key: string;
-    name: string;
-    fieldName: string;
-    isResizable: boolean;
-    minWidth: number;
-}
 
 
 export async function getJobs(authContext: AuthContextInterface) {
@@ -127,12 +119,8 @@ export async function getJobs(authContext: AuthContextInterface) {
                 })
             }
         }
-        const cols: Col[] = [
-            { key: '1', name: 'Migration job name', fieldName: 'id', isResizable: true, minWidth: 150 },
-            { key: '2', name: 'Device group', fieldName: 'dgroup', isResizable: true, minWidth: 150 },
-            { key: '3', name: 'Status', fieldName: 'status', isResizable: true, minWidth: 150 }
-        ]
-        return { rows, cols };
+        
+        return rows;
 
     } catch (error) {
         throw error;

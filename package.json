@@ -6,8 +6,6 @@
   "engines": {
     "node": ">=16"
   },
-  "homepage": "https://github.com/Azure/iotc-migrator",
-  "bugs": "https://github.com/Azure/iotc-migrator/issues",
   "author": "Azure IoT",
   "license": "MIT",
   "dependencies": {

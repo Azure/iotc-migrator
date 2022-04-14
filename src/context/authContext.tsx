@@ -20,7 +20,7 @@ export interface AuthContextInterface {
     loginAccount: msal.AccountInfo | undefined;
     signIn: (silent: boolean) => Promise<void>;
     signOut: () => Promise<void>;
-    getAccessToken: (authContext?: msal.AccountInfo, scope?: string) => Promise<string> ;
+    getAccessToken: (authContext?: msal.AccountInfo, scope?: string) => Promise<string>;
     error: any;
 }
 
@@ -72,9 +72,9 @@ export function AuthProvider({ children }: { children: any }) {
                     res = await getAccessTokenForScope({ silentFail: silent, msalInstance, scope: Scopes.ARM, options: loginAccount ? { account: loginAccount } : null });
                 }
             }
-            
+
             // at this point we should have a token otherwise the catch will have thrown an error on the modal
-            
+
             msalInstance.setActiveAccount(res?.account as msal.AccountInfo);
 
             setState({
@@ -125,7 +125,7 @@ interface AccessTokenForScope {
     options: any;
 }
 
-async function getAccessTokenForScope({ silentFail, msalInstance, scope, options }: AccessTokenForScope): Promise<msal.AuthenticationResult | null> {
+async function getAccessTokenForScope({ msalInstance, scope, options }: AccessTokenForScope): Promise<msal.AuthenticationResult | null> {
     const tokenRequest = {
         scopes: Array.isArray(scope) ? scope : [scope],
         forceRefresh: false,
@@ -137,9 +137,6 @@ async function getAccessTokenForScope({ silentFail, msalInstance, scope, options
         // try to get token silently if the user is already signed in
         return await msalInstance.acquireTokenSilent(tokenRequest);
     } catch (err) {
-        // if (silentFail) {
-        //     return null;
-        // }
         console.log('login error', err);
         try {
             // show the login popup if the user is not signed in

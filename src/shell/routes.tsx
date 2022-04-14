@@ -10,14 +10,14 @@ export const Paths = {
 
 export function Routes({ appReady }: { appReady: boolean }) {
 
+    if (!appReady) {
+        return <Shell />;
+    }
+
     return (
         <ReactRoutes>
-            <Route path={Paths.home} element={appReady ? <NewMigration /> : <Shell />} />
-            <Route path={Paths.status} element={appReady ? <Status /> : <Shell />} />
-            <Route
-                path="*"
-                element={<Route path={Paths.home} element={<Shell />} />}
-            />
+            <Route path={Paths.home} element={<NewMigration />} />
+            <Route path={Paths.status} element={<Status />} />
         </ReactRoutes>
     );
 }

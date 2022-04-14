@@ -7,15 +7,21 @@ import usePromise from '../../hooks/usePromise';
 import { AuthContext } from '../../context/authContext';
 import { AppDataContext } from '../../context/appDataContext';
 import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
-import { Col, getJobs, Row } from '../../iotcAPI';
+import { getJobs, Row } from '../../iotcAPI';
+import { useNavigate } from 'react-router-dom';
 const cx = classnames.bind(require('./status.scss'));
 
 function Status() {
-  const authContext: any = React.useContext(AuthContext);
-  const appDataContext: any = React.useContext(AppDataContext);
+  const authContext = React.useContext(AuthContext);
+  const appDataContext = React.useContext(AppDataContext);
+  const navigate = useNavigate();
 
-  const [tableData, setTableData] = React.useState<{ rows: Row[], cols: Col[] }>({ cols: [], rows: [] });
+  const [tableData, setTableData] = React.useState<Row[]>([]);
   const [loading, data, error, fetch] = usePromise();
+
+  const newMigration = React.useCallback(() => {
+    navigate('/');
+  }, [navigate]);
 
   const cmdBar: ICommandBarItemProps[] = React.useMemo(() => [{
     key: '1',
@@ -25,8 +31,14 @@ function Status() {
     },
     onClick: () => { fetch({ promiseFn: () => getJobs(authContext) }); },
     disabled: false
-    // eslint-disable-next-line
-  }], []);
+  }, {
+    key: '2',
+    text: 'New migration',
+    iconProps: {
+      iconName: 'Add'
+    },
+    onClick: newMigration,
+  }], [authContext, fetch, newMigration]);
 
 
   React.useEffect(() => {
@@ -35,7 +47,7 @@ function Status() {
       if (!!response) {
         setTableData(response);
       }
-    }, 5000);
+    }, 2000);
 
     return () => clearInterval(intervalId);
   }, [setTableData, fetch, authContext]);
@@ -45,22 +57,33 @@ function Status() {
     setTableData(data);
   }, [data])
 
-  const _onRenderRow = (props: any) => {
+  const _onRenderRow = (props) => {
     if (!props) {
       return null;
     }
     return <DetailsRow {...props} className={cx('row')} />;
   };
 
-  const _onRenderItemColumn = (item: any, _index, column: any) => {
+  const cols = React.useMemo(() => {
+    return [
+      { key: '1', name: 'Migration job name', fieldName: 'id', isResizable: true, minWidth: 150, maxWidth: 350 },
+      { key: '2', name: 'Device group', fieldName: 'dgroup', isResizable: true, minWidth: 150, maxWidth: 350 },
+      { key: '3', name: 'Status', fieldName: 'status', isResizable: true, minWidth: 150, maxWidth: 350 }
+    ];
+  }, []);
+
+  const _onRenderItemColumn = (item, _index, column) => {
     switch (column.fieldName) {
       case 'dgroup':
-        return <a target='_blank' rel='noreferrer' href={`https://${authContext.applicationHost}/device-groups/${item[column.fieldName]}`}>
-          {appDataContext.groups[item[column.fieldName]]}
+        const groupId = item.dgroup;
+        const group = appDataContext.groups.find(g => g.key === groupId);
+
+        return <a target='_blank' rel='noreferrer' href={`https://${authContext.applicationHost}/device-groups/${group?.key}`}>
+          {group?.text}
         </a>;
       case 'id':
         return <a target='_blank' rel='noreferrer' href={`https://${authContext.applicationHost}/jobs/instances/${item[column.fieldName]}`}>
-          {item['name']}
+          {item.name}
         </a>;
       default:
         return <span>{item[column.fieldName]}</span>;
@@ -79,24 +102,21 @@ function Status() {
       <div className={cx('workspace-container')}>
         <div className={cx('workspace-title')}>
           <h1 className={cx('title')}>Migration status</h1>
-          <p>{authContext.applicationHost} migration status.</p>
+          <p>Watch all the migration process for <span className={cx('app-name')}>{authContext.applicationHost}</span>.</p>
         </div>
         <div className={cx('workspace-content')}>
           <div className={cx('workspace-table', { 'status-padding': loading })}>
-            {tableData.rows.length
-              ? <DetailsList
-                compact={true}
-                items={tableData.rows}
-                columns={tableData.cols}
-                selectionMode={SelectionMode.none}
-                constrainMode={ConstrainMode.unconstrained}
-                onRenderRow={_onRenderRow}
-                onRenderItemColumn={_onRenderItemColumn}
-                setKey='set'
-                className={cx('table')}
-              />
-              : <div className={cx('no-data')}>No migration found</div>
-            }
+            <DetailsList
+              compact={true}
+              items={tableData}
+              columns={cols}
+              selectionMode={SelectionMode.none}
+              constrainMode={ConstrainMode.unconstrained}
+              onRenderRow={_onRenderRow}
+              onRenderItemColumn={_onRenderItemColumn}
+              setKey='set'
+              className={cx('table')}
+            />
           </div>
         </div>
 

@@ -51,6 +51,18 @@ export function AuthProvider({ children }: { children: any }) {
             return;
         }
 
+        if(Config.AADClientID === '<your-AAD-client-id>'){
+            setState({
+                ...state,
+                loginAccount: undefined,
+                authenticated: true,
+                error: {
+                    message: 'Please update the config object in src/config.ts'
+                }
+            });
+            return;
+        }
+
         let loginAccount: msal.AuthenticationResult = {} as msal.AuthenticationResult;
 
         // @returns Token response or null. If the return value is null, then no auth redirect was detected.

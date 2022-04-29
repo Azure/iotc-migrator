@@ -1,8 +1,8 @@
 
 export const Config = {
     AADLoginServer: 'https://login.microsoftonline.com',
-    AADClientID: '<your-AAD-Application-(client)-ID>',
-    AADDirectoryID: '<your-AAD-Directory-(tenant)-ID>',
+    AADClientID: 'db2b0d5f-966d-4ec4-bf8a-7c5048a8a0e1',
+    AADDirectoryID: 'f9ece212-aff6-4e3b-8da7-3e76918a9f93',
     AADRedirectURI: 'http://localhost:3000',
-    applicationHost: '<your-iot-central-app>.azureiotcentral.com'
+    applicationHost: 'migration-17.azureiotcentral.com'
 }

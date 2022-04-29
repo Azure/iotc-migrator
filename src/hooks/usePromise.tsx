@@ -3,7 +3,7 @@ import * as React from 'react';
 const usePromise = () => {
     const [loading, setLoading] = React.useState(false);
     const [data, setData] = React.useState<any>(null);
-    const [error, setError] = React.useState(null);
+    const [error, setError] = React.useState<any>(null);
 
     const callPromise = async ({ promiseFn }: { promiseFn: any }) => {
         setLoading(true);

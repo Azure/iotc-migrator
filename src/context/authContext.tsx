@@ -1,61 +1,11 @@
-import { Config } from '../config'
 import * as msal from '@azure/msal-browser';
 import * as React from 'react';
+import { Config } from '../config';
 
 export interface AppConfig {
     applicationId: string;
     directoryId: string;
     applicationHost: string;
-}
-
-function getAccessTokenForScope(silentFail: boolean, msalInstance: any, scope: string, options: any) {
-    const tokenRequest: any = Object.assign({}, options, {
-        scopes: Array.isArray(scope) ? scope : [scope],
-        forceRefresh: false,
-        redirectUri: msalConfig.auth.redirectUri
-    });
-
-    return new Promise((resolve, reject) => {
-        msalInstance.acquireTokenSilent(tokenRequest)
-            .then((res: any) => {
-                resolve(res)
-            })
-            .catch((err: any) => {
-                if (silentFail) {
-                    reject(err);
-                    return;
-                }
-                msalInstance.acquireTokenPopup(tokenRequest)
-                    .then((res: any) => {
-                        resolve(res)
-                    })
-                    .catch((err: any) => {
-                        if (err.name === 'BrowserAuthError') {
-                            msalInstance.acquireTokenPopup(tokenRequest)
-                                .then((res: any) => {
-                                    resolve(res)
-                                })
-                                .catch((err: any) => {
-                                    reject(err);
-                                })
-
-                        } else {
-                            reject(err);
-                        }
-                    });
-            });
-    });
-}
-
-export const msalConfig = {
-    auth: {
-        clientId: Config.AADClientID,
-        authority: Config.AADLoginServer + '/' + Config.AADDirectoryID,
-        redirectUri: Config.AADRedirectURI
-    },
-    cache: {
-        cacheLocation: 'localStorage'
-    }
 }
 
 export const Scopes = {
@@ -64,89 +14,152 @@ export const Scopes = {
     ARM: 'https://management.azure.com/user_impersonation'
 }
 
-export const AuthContext = React.createContext({});
+export interface AuthContextInterface {
+    authenticated: boolean;
+    applicationHost: string;
+    loginAccount: msal.AccountInfo | undefined;
+    signIn: (silent: boolean) => Promise<void>;
+    signOut: () => Promise<void>;
+    getAccessToken: (authContext?: msal.AccountInfo, scope?: string) => Promise<string>;
+    error: any;
+}
 
-export class AuthProvider extends React.Component {
+export const AuthContext = React.createContext<AuthContextInterface>({} as AuthContextInterface);
 
-    private msalInstance: any = null;
+export function AuthProvider({ children }: { children: any }) {
 
-    constructor(props: any) {
-        super(props);
+    const urlParams = new URLSearchParams(window.location.search);
+    const applicationHost = urlParams?.get?.('appHost');
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const applicationHost = urlParams && urlParams.get('appHost') ? urlParams.get('appHost') : null;
+    const msalConfig = React.useMemo(() => {
+        return {
+            auth: {
+                clientId: Config.AADClientID,
+                authority: `${Config.AADLoginServer}/${Config.AADDirectoryID}`,
+                redirectUri: Config.AADRedirectURI
+            },
+            cache: {
+                cacheLocation: 'localStorage'
+            }
+        };
+    }, []);
 
-        this.state.applicationId = Config.AADClientID;
-        this.state.directoryId = Config.AADDirectoryID;
-        this.state.applicationHost = applicationHost || Config.applicationHost;
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-        msalConfig.auth.clientId = this.state.applicationId;
-        msalConfig.auth.authority = Config.AADLoginServer + '/' + this.state.directoryId;
-        this.msalInstance = new msal.PublicClientApplication(msalConfig);
-    }
+    async function signIn(silent = false) {
+        if (state.authenticated) {
+            return;
+        }
 
-    signIn = (silent: boolean) => {
-        if (this.state.authenticated) { return; }
-
-        let loginAccount: any = {};
-
-        this.msalInstance.handleRedirectPromise()
-            .then((res: any) => {
-                loginAccount = res ? res.data.value[0] : this.msalInstance.getAllAccounts()[0];
-                return getAccessTokenForScope(silent, this.msalInstance, Scopes.Graph, loginAccount ? { account: loginAccount } : null);
-            })
-            .then((res: any) => {
-                loginAccount = res.account;
-                return getAccessTokenForScope(silent, this.msalInstance, Scopes.Central, loginAccount ? { account: loginAccount } : null);
-            })
-            .then((res: any) => {
-                loginAccount = res.account;
-                return getAccessTokenForScope(silent, this.msalInstance, Scopes.ARM, loginAccount ? { account: loginAccount } : null);
-            })
-            .then(() => {
-                this.setState({
-                    loginAccount,
-                    authenticated: true,
-                    initialized: false
-                })
-            })
-            .catch((err: any) => {
-                console.log(err);
-                console.log('Silent auth failed. User must sign in');
+        if(Config.AADClientID === '<your-AAD-client-id>'){
+            setState({
+                ...state,
+                loginAccount: undefined,
+                authenticated: true,
+                error: {
+                    message: 'Please update the config object in src/config.ts'
+                }
             });
+            return;
+        }
+
+        let loginAccount: msal.AuthenticationResult = {} as msal.AuthenticationResult;
+
+        // @returns Token response or null. If the return value is null, then no auth redirect was detected.
+        let res = await msalInstance.handleRedirectPromise();
+
+        try {
+            loginAccount = res
+                ? (res as any).data.value[0]
+                : msalInstance.getAllAccounts()[0];
+
+            try {
+                res = await getAccessTokenForScope({ silentFail: silent, msalInstance, scope: Scopes.Graph, options: loginAccount ? { account: loginAccount } : null });
+            } catch (error) {
+                //swallow error and try with a IoTCentral scope
+                try {
+                    res = await getAccessTokenForScope({ silentFail: silent, msalInstance, scope: Scopes.Central, options: loginAccount ? { account: loginAccount } : null });
+                } catch (error) {
+                    //swallow error and try with a ARM scope
+                    res = await getAccessTokenForScope({ silentFail: silent, msalInstance, scope: Scopes.ARM, options: loginAccount ? { account: loginAccount } : null });
+                }
+            }
+
+            // at this point we should have a token otherwise the catch will have thrown an error on the modal
+
+            msalInstance.setActiveAccount(res?.account as msal.AccountInfo);
+
+            setState({
+                ...state,
+                loginAccount: res?.account as msal.AccountInfo,
+                authenticated: true,
+                error: undefined
+            });
+
+        } catch (err) {
+            setState({
+                ...state,
+                error: err,
+            });
+        }
     }
 
-    getAccessToken = async () => {
-        const res: any = await getAccessTokenForScope(true, this.msalInstance, Scopes.Central, { account: this.state.loginAccount });
-        return res.accessToken;
+    async function getAccessToken(authContext?: msal.AccountInfo | undefined, scope?: string) {
+        const res = await getAccessTokenForScope({ silentFail: true, msalInstance, scope: scope || Scopes.Central, options: { account: state.loginAccount || authContext } });
+        return res?.accessToken;
     }
 
-    getArmAccessToken = async () => {
-        const res: any = await getAccessTokenForScope(true, this.msalInstance, Scopes.ARM, { account: this.state.loginAccount });
-        return res.accessToken;
+    async function signOut() {
+        await msalInstance.logoutRedirect();
     }
 
-    signOut = () => {
-        this.msalInstance.logout();
-    }
-
-    state: any = {
+    const [state, setState] = React.useState<AuthContextInterface>({
         authenticated: false,
-        applicationId: '',
-        directoryId: '',
-        applicationHost: '',
-        loginAccount: {},
-        signIn: this.signIn,
-        signOut: this.signOut,
-        getAccessToken: this.getAccessToken,
-        getArmAccessToken: this.getArmAccessToken
-    }
+        applicationHost: applicationHost || Config.applicationHost,
+        loginAccount: undefined,
+        signIn,
+        signOut,
+        getAccessToken,
+        error: undefined,
+    });
 
-    render() {
-        return (
-            <AuthContext.Provider value={this.state}>
-                {this.props.children}
-            </AuthContext.Provider>
-        )
+    return (
+        <AuthContext.Provider value={state}>
+            {children}
+        </AuthContext.Provider>
+    )
+}
+
+interface AccessTokenForScope {
+    silentFail: boolean;
+    msalInstance: msal.PublicClientApplication;
+    scope: string;
+    options: any;
+}
+
+async function getAccessTokenForScope({ msalInstance, scope, options }: AccessTokenForScope): Promise<msal.AuthenticationResult | null> {
+    const tokenRequest = {
+        scopes: Array.isArray(scope) ? scope : [scope],
+        forceRefresh: false,
+        redirectUri: Config.AADRedirectURI,
+        ...options,
+    };
+
+    try {
+        // try to get token silently if the user is already signed in
+        return await msalInstance.acquireTokenSilent(tokenRequest);
+    } catch (err) {
+        console.log('login error', err);
+        try {
+            // show the login popup if the user is not signed in
+            return await msalInstance.acquireTokenPopup(tokenRequest)
+        } catch (error: any) {
+            console.log('login error', error);
+            if (error.name === 'BrowserAuthError') {
+                return await msalInstance.acquireTokenPopup(tokenRequest);
+            } else {
+                throw error;
+            }
+        }
     }
 }

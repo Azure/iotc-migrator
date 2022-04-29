@@ -10,7 +10,8 @@ export function getTextFieldStyles(props: ITextFieldStyleProps): Partial<ITextFi
                 ":hover": {
                     border: '1px solid #136bfb',
                 }
-            }
+            },
+            width: 400,
         }]
     };
 }

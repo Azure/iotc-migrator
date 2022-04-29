@@ -4,76 +4,46 @@
 @import "../styles/_icons";
 @import "../styles/_mixins";
 @import "../styles/_typography";
+@import "~@microsoft/azure-iot-ux-fluent-controls/lib/components/Masthead/Masthead.module.scss";
+@import "~@microsoft/azure-iot-ux-fluent-controls/lib/components/Shell/shell.module.scss";
+@import "~@microsoft/azure-iot-ux-fluent-controls/lib/components/Navigation/Navigation.module.scss";
 
 .shell {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .shell-initial {
-    padding: 2rem;
+  padding: 2rem;
 }
 
 .sign-out {
-    margin-right: 0.5rem;
-    button {
-        cursor: pointer;
-        border: 0;
-        background-color: transparent;
-    }
+  margin-right: 0.5rem;
+  button {
+    cursor: pointer;
+    border: 0;
+    background-color: transparent;
+  }
 
-    button:hover {
-        color: lightgray;
-    }
+  button:hover {
+    color: lightgray;
+  }
 }
 
 .no-auth {
-    text-align: right;
-    padding: 0 1rem 1rem 0;
-    font-weight: 1000;
-    color: red;
-}
-
-.waffle-button {
-    button {
-        width: 48px;
-        cursor: pointer;
-        padding: 1rem;
-        background-color: transparent;
-        border: none;
-    }
-
-    button:hover {
-        background-color: white;
-        color: black;
-    }
-
-    /* should not do this hack */
-    button:focus {
-        outline: none;
-    }
-}
-
-.waffle-panel-nav {
-    padding-right: 1rem;
-    min-width: 320px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    a:hover {
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        text-decoration-thickness: 0.025em;
-    }
+  text-align: right;
+  padding: 0 1rem 1rem 0;
+  font-weight: 1000;
+  color: red;
 }
 
 .arrow-icon {
-    font-size: 0.6rem;
-    margin-left: 0.25rem;
+  font-size: 0.6rem;
+  margin-left: 0.25rem;
 }
 
 .ms-Panel-content {
-    padding: 0 1rem;
+  padding: 0 1rem;
 }
+

@@ -10,7 +10,7 @@ A Companion Experience that enables you to move devices between Azure IoT Centra
 
 2. Azure Active Directory Application (AAD).  
 
-    > Go to [Azure Portal > AAD > App registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) to create a new AAD Application and follow the [instruction below](#Create-an-AAD-Application).
+    > Go to [Azure Portal > AAD > App registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) to create a new AAD Application and follow the [instruction below](#create-an-aad-application).
 
 3. An Azure IoT Hub instance
 

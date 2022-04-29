@@ -48,7 +48,7 @@ Once the Application is loaded, follow the guidelines in the UI to perform a mig
 
  > NOTE: To perform successfully the migration, make sure that the _device template_ associated to your devices has a Command capability named __DeviceMove__.
 
-### Create and AAD Application
+### Create an AAD Application
 
 1. Go to [Azure Portal > Azure Active Directory > App Registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
 

@@ -1,4 +1,4 @@
-# iotc-migrator
+# Iotc-migrator
 
 A Companion Experience that enables you to move devices between Azure IoT Central applications or move devices from an Azure IoT Central application to an Azure IoT Hub.
 
@@ -6,54 +6,70 @@ A Companion Experience that enables you to move devices between Azure IoT Centra
 
 1. An IoT Central Application
 
-2. Azure Active Directory Application to get the AAD ClientId and AAD Directory/Tenant Id.  
- 
-> To create a new App go to [Azure Portal](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)` 
+    > Go to [IoT Central](https://apps.azureiotcentral.com/home) to create one.
 
+2. Azure Active Directory Application (AAD).  
 
+    > Go to [Azure Portal > AAD > App registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) to create a new AAD Application and follow the [instruction below](#Create-an-AAD-Application).
 
-## Getting Started with Create React App
+3. An Azure IoT Hub instance
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+    > Go to [Azure Portal > IoT Hub](https://portal.azure.com/#create/Microsoft.IotHub) to create one IoT Hub.
 
-## Available Scripts
+4. An Azure IoT Hub Device Provisioning Services (DPS) associated to the IoT Hub instance
 
-In the project directory, you can run:
+    > Go to [Azure Portal > DPS](https://portal.azure.com/#create/Microsoft.IoTDeviceProvisioning) to create one DPS.
 
-### `npm start`
+## Setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Update the [config.ts](./src/config.ts) using the information from your AAD application.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```typescript
+{
+    AADLoginServer: 'https://login.microsoftonline.com',
+    AADClientID: '<your-AAD-Application-(client)-ID>',
+    AADDirectoryID: '<your-AAD-Directory-(tenant)-ID>',
+    AADRedirectURI: 'http://localhost:3000',
+    applicationHost: '<your-iot-central-app>.azureiotcentral.com'
+}
+```
 
-### `npm test`
+> Make sure that the `AADRedirectURI` in the config file and the `Redirect URIs` specified in your AAD Application are the same.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## First run
 
-### `npm run build`
+You can run the SPA in the development mode using:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+ `npm start`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Open in the browser the `AADRedirectURI url` previously defined in your `config.ts` (by default is [http://localhost:3000](http://localhost:3000)) to view it in the browser.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Once the Application is loaded, follow the guidelines in the UI to perform a migration from the IoT Central application to Azure IoT Hub.
 
-### `npm run eject`
+ > NOTE: To perform successfully the migration, make sure that the _device template_ associated to your devices has a Command capability named __DeviceMove__.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Create and AAD Application
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Go to [Azure Portal > Azure Active Directory > App Registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+2. Click on _New Registration_
+![New registration](/assets/registerApp.png)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+3. Fill the form using making sure to put in the `Redirect URI` the same value defined in the `config.ts` under _AADRedirectURI_
+![Create app](/assets/newApp.png)
 
-## Learn More
+4. Click _Register_ and once the app is created you will get the paramaters needed in the `config.ts`
+![App created](/assets/appCreated.png)
+
+### Codebase
+
+Iotc-migrator is a React SPA application written in Typescript that runs 100% in the browser. It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+The project consume the [IoT Central Rest APIs](https://docs.microsoft.com/rest/api/iotcentral/) with the following version: _1.1-preview_.
+
+The Authentication is performed using [Microsoft Authentication Library (MSAL)](https://www.npmjs.com/package/msal).
+
+### Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 

@@ -14,17 +14,16 @@
     "@microsoft/azure-iot-ux-fluent-controls": "^8.0.8",
     "@microsoft/azure-iot-ux-fluent-css": "^8.1.8",
     "axios": "^0.26.1",
-    "classnames": "^2.3.1",
-    "node-sass": "^7.0.1",
     "react": "16.x",
     "react-dom": "16.x",
     "react-hook-form": "^7.29.0",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "^5.0.1",
     "util": "^0.12.4",
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {
+    "classnames": "^2.3.1",
+    "node-sass": "^7.0.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
@@ -40,6 +39,7 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.4.0",
+    "react-scripts": "^5.0.1",
     "typescript": "^4.2.3",
     "web-vitals": "^2.1.4"
   },

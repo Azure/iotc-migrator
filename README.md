@@ -1,76 +1,70 @@
-# Iotc-migrator
+# Getting Started with Create React App
 
-A Companion Experience that enables you to move devices between Azure IoT Central applications or move devices from an Azure IoT Central application to an Azure IoT Hub.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Requirement
+## Available Scripts
 
-1. An IoT Central Application
+In the project directory, you can run:
 
-    > Go to [IoT Central](https://apps.azureiotcentral.com/home) to create one.
+### `npm start`
 
-2. Azure Active Directory Application (AAD).  
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-    > Go to [Azure Portal > AAD > App registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) to create a new AAD Application and follow the [instruction below](#create-an-aad-application).
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-3. An Azure IoT Hub instance
+### `npm test`
 
-    > Go to [Azure Portal > IoT Hub](https://portal.azure.com/#create/Microsoft.IotHub) to create one IoT Hub.
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-4. An Azure IoT Hub Device Provisioning Services (DPS) associated to the IoT Hub instance
+### `npm run build`
 
-    > Go to [Azure Portal > DPS](https://portal.azure.com/#create/Microsoft.IoTDeviceProvisioning) to create one DPS.
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## Setup
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-Update the [config.ts](./src/config.ts) using the information from your AAD application.
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-```typescript
-{
-    AADLoginServer: 'https://login.microsoftonline.com',
-    AADClientID: '<your-AAD-Application-(client)-ID>',
-    AADDirectoryID: '<your-AAD-Directory-(tenant)-ID>',
-    AADRedirectURI: 'http://localhost:3000',
-    applicationHost: '<your-iot-central-app>.azureiotcentral.com'
-}
-```
+### `npm run eject`
 
-> Make sure that the `AADRedirectURI` in the config file and the `Redirect URIs` specified in your AAD Application are the same.
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-## First run
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-You can run the SPA in the development mode using:
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
- `npm start`
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-Open in the browser the `AADRedirectURI url` previously defined in your `config.ts` (by default is [http://localhost:3000](http://localhost:3000)) to view it in the browser.
-
-Once the Application is loaded, follow the guidelines in the UI to perform a migration from the IoT Central application to Azure IoT Hub.
-
- > NOTE: To perform successfully the migration, make sure that the _device template_ associated to your devices has a Command capability named __DeviceMove__.
-
-### Create an AAD Application
-
-1. Go to [Azure Portal > Azure Active Directory > App Registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
-
-2. Click on _New Registration_
-![New registration](/assets/registerApp.png)
-
-3. Fill the form using making sure to put in the `Redirect URI` the same value defined in the `config.ts` under _AADRedirectURI_
-![Create app](/assets/newApp.png)
-
-4. Click _Register_ and once the app is created you will get the paramaters needed in the `config.ts`
-![App created](/assets/appCreated.png)
-
-### Codebase
-
-Iotc-migrator is a React SPA application written in Typescript that runs 100% in the browser. It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-The project consume the [IoT Central Rest APIs](https://docs.microsoft.com/rest/api/iotcentral/) with the following version: _1.1-preview_.
-
-The Authentication is performed using [Microsoft Authentication Library (MSAL)](https://www.npmjs.com/package/msal).
-
-### Learn More
+## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

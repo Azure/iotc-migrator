@@ -1,0 +1,108 @@
+.container {
+    height: 100%;
+}
+
+.masthead {
+    height: 3rem;
+    background-color: #3c3c41;
+    color: white;
+    display: flex;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav {
+    height: 100%;
+}
+
+.signOut {
+    cursor: pointer;
+}
+
+.content {
+    display: flex;
+    background-color: #f3f2f1;
+    height: 100%;
+}
+
+.page {
+    padding-left: 3rem;
+    padding-right: 3rem;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.formHeader {
+    margin-bottom: 2em;
+}
+.formInput {
+    width: 400px;
+    margin-bottom: 2em;
+}
+
+.spaced-right {
+    margin-right: 2em;
+}
+
+.spaced-left {
+    margin-left: 2em;
+}
+
+.center-vertical {
+    display: flex;
+    align-items: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex.horizontal {
+    flex-direction: row;
+}
+
+.flex.vertical {
+    flex-direction: column;
+}
+
+.center-horizontal {
+    display: flex;
+    justify-content: center;
+}
+
+.section {
+    padding: 2em;
+    border: 1px solid gray;
+    width: fit-content;
+    margin-bottom: 2em;
+}
+
+.section > label {
+    margin-top: -3.5em;
+    text-align: center;
+    background-color: white;
+}
+
+.migration-arrow {
+    /* transform: scale(-2, -4) translate(0, -0.5em); */
+    font-size: x-large;
+}
+
+.migration-arrow-disabled {
+    /* transform: scale(-2, -4) translate(0, -0.5em); */
+    font-size: x-large;
+    color: gray;
+}
+
+.bottom-margin {
+    margin-bottom: 3em;
+}
+
+.padding1 {
+    padding: 1em;
+}

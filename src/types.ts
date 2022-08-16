@@ -1,4 +1,5 @@
 export const JOB_DESCRIPTION = 'AUTOMATED-DEVICE-MOVE'
+export const STORAGE_ITEM = 'hubJobs'
 
 export enum MigrationMode {
     Central = 'Central',
@@ -31,15 +32,18 @@ export type CentralSourceParams = {
 }
 
 export type CentralTargetParams = {
-    deviceTemplateId: string
+    idScope?: string
+    deviceTemplateId?: string
 }
 
 export type DPSSourceParams = {
+    dpsHost: string
+    dpsLink: string
+    idScope: string
     iothubs: {
         name: string
         host: string
         id: string
-        sasToken: string
         selected: boolean
     }[]
 }
@@ -83,6 +87,12 @@ export type CommandPayload = {
     dpsId: string
 }
 
+export type EnrollmentGroup = {
+    primaryKey: string
+    secondaryKey: string
+    idScope?: string
+}
+
 export type JobPayload = {
     displayName: string
     group: string
@@ -113,6 +123,30 @@ export type JobResult = {
     jobLink?: string
 }
 
+export enum HubJobStatus {
+    PENDING = 'pending',
+    RUNNING = 'running',
+    COMPLETED = 'completed',
+    FAILED = 'failed',
+}
+
+export type HubJob = {
+    id:string,
+    hubName: string
+    hubHost: string
+    appHost: string
+    hubId: string
+    dpsLink: string
+    dpsId: string
+    dpsHost: string
+    dpsIdScope: string
+    status: HubJobStatus
+    enrollment?: {
+        primaryKey: string
+        secondaryKey: string
+    }
+}
+
 export const TOKEN_AUDIENCES = {
     Arm: 'https://management.azure.com/user_impersonation',
     Central: 'https://apps.azureiotcentral.com/user_impersonation',
@@ -124,6 +158,7 @@ export const API_VERSIONS = {
     Central_Preview: '1.2-preview',
     ResourceManager: '2021-04-01',
     DPS: '2022-02-05',
+    DPSData: '2021-06-01',
     IoTHubArm: '2018-04-01',
     IoTHubData: '2020-05-31-preview',
 }

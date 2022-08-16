@@ -10,8 +10,10 @@ import {
     JOB_DESCRIPTION,
     JobResult,
     JobPayload,
+    EnrollmentGroup,
 } from './types'
 import { v4 as uuid } from 'uuid'
+import axios from 'axios'
 
 export const msalConfig = {
     auth: {
@@ -143,6 +145,73 @@ export async function getHubKeys(hubId: string, policyName: string) {
     return hubResp.json()
 }
 
+export async function getDPSKeys(dpsId: string, policyName: string) {
+    const armToken = await getToken(
+        'https://management.azure.com/user_impersonation'
+    )
+    const params = {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${armToken}`,
+        },
+    }
+
+    const dpsResp = await fetch(
+        `https://management.azure.com${dpsId}/keys/${policyName}/listkeys?api-version=${API_VERSIONS.DPS}`,
+        params
+    )
+    return dpsResp.json()
+}
+
+export async function getDPSEnrollmentKeys(
+    dpsHost: string,
+    sasToken: string
+): Promise<{ primaryKey: string; secondaryKey: string }> {
+    const params = {
+        method: 'POST',
+        crossDomain: true,
+        headers: {
+            Authorization: sasToken,
+            'Content-Type': 'application/json',
+            Accept: '*/*',
+            Host: dpsHost,
+        },
+        body: JSON.stringify({
+            query: '*',
+        }),
+    }
+    const resp = await axios.post(
+        `https://${dpsHost}/enrollmentGroups/query?api-version=${API_VERSIONS.DPSData}`,
+        {
+            query: '*',
+        },
+        {
+            withCredentials: false,
+            headers: {
+                Authorization: sasToken,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const listResp = await fetch(
+        `https://${dpsHost}/enrollmentGroups/query?api-version=${API_VERSIONS.DPSData}`,
+        params
+    )
+    const groups = await listResp.json()
+    const group = groups.find((g: any) => g.attestation.type === 'symmetricKey')
+    if (!group) {
+        throw new ApiError(
+            'Failed to query DPS',
+            'Cannot find an enrollment group with symmetric keys.'
+        )
+    }
+    const enrollMentResp = await fetch(
+        `https://${dpsHost}/enrollmentGroups/${group.enrollmentGroupId}attestationmechanism?api-version=${API_VERSIONS.DPSData}`,
+        params
+    )
+    return (await enrollMentResp.json()).symmetricKey
+}
+
 export async function listDPSs() {
     const armToken = await getToken(
         'https://management.azure.com/user_impersonation'
@@ -246,6 +315,36 @@ export async function listDevicesInHub(
     return listResp.json()
 }
 
+export async function invokeCommand(
+    hubHost: string,
+    sasToken: string,
+    deviceId: string,
+    idScope: string
+) {
+    const params = {
+        method: 'POST',
+        headers: {
+            Authorization: sasToken,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            methodName: 'DeviceMove',
+            payload: idScope,
+        }),
+    }
+    const cmdResp = await fetch(
+        `https://${hubHost}/twins/${deviceId}/methods?api-version=${API_VERSIONS.IoTHubData}`,
+        params
+    )
+    if (!cmdResp.ok && cmdResp.status === 404) {
+        throw new ApiError(
+            'IoT Hub error',
+            `Device ${deviceId} not found or not online.`
+        )
+    }
+    return cmdResp.json()
+}
+
 export async function listCentralApps() {
     const armToken = await getToken(
         'https://management.azure.com/user_impersonation'
@@ -287,6 +386,141 @@ export async function listDeviceGroups(appDomain: string) {
         params
     )
     return (await groups.json()).value
+}
+
+export async function createCentralEnrollment(
+    appDomain: string,
+    symmetricKey: { primaryKey: string; secondaryKey: string }
+) {
+    const centralToken = await getToken(TOKEN_AUDIENCES.Central)
+    const params = {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${centralToken}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            displayName: 'MIGRATION_ENROLLMENT',
+            enabled: true,
+            type: 'iot',
+            attestation: {
+                type: 'symmetricKey',
+                symmetricKey,
+            },
+        }),
+    }
+    const enrollmentGroup = await fetch(
+        `https://${appDomain}.azureiotcentral.com/api/enrollmentGroups/${uuid()}?api-version=${
+            API_VERSIONS.Central
+        }`,
+        params
+    )
+    if (!enrollmentGroup.ok) {
+        if (enrollmentGroup.status === 409) return
+    }
+    return enrollmentGroup.json()
+}
+
+export async function getCentralIdScope(
+    appDomain: string,
+    centralToken?: string
+) {
+    // lack of support for getting id scope. creating a temp device to fetch it
+    const bearer = centralToken || (await getToken(TOKEN_AUDIENCES.Central))
+
+    const tempDevId = uuid()
+    const createparams = {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${bearer}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            displayName: 'tempdev',
+            enabled: true,
+            simulated: false,
+        }),
+    }
+    const tempDev = await fetch(
+        `https://${appDomain}.azureiotcentral.com/api/devices/${tempDevId}?api-version=${API_VERSIONS.Central}`,
+        createparams
+    )
+    if (!tempDev.ok) {
+        throw new ApiError(
+            'IoT Central error',
+            'Cannot fetch Id Scope information'
+        )
+    }
+    const getParams = {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${bearer}`,
+        },
+    }
+    const creds = await fetch(
+        `https://${appDomain}.azureiotcentral.com/api/devices/${tempDevId}/credentials?api-version=${API_VERSIONS.Central}`,
+        getParams
+    )
+    if (!creds.ok) {
+        throw new ApiError(
+            'IoT Central error',
+            'Cannot fetch Id Scope information'
+        )
+    }
+    const idScope = (await creds.json()).idScope
+
+    // delete device
+    const deleteparams = {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${bearer}`,
+        },
+    }
+    const deleteDev = await fetch(
+        `https://${appDomain}.azureiotcentral.com/api/devices/${tempDevId}?api-version=${API_VERSIONS.Central}`,
+        deleteparams
+    )
+    if (!deleteDev.ok) {
+        throw new ApiError(
+            'IoT Central error',
+            'Cannot delete temporary device'
+        )
+    }
+    return idScope
+}
+
+export async function getCentralEnrollment(
+    appDomain: string,
+    centralToken?: string
+): Promise<EnrollmentGroup> {
+    const bearer = centralToken || (await getToken(TOKEN_AUDIENCES.Central))
+    const getParams = {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${bearer}`,
+        },
+    }
+    const enrollments = await fetch(
+        `https://${appDomain}.azureiotcentral.com/api/enrollmentGroups?api-version=${API_VERSIONS.Central}`,
+        getParams
+    )
+    if (!enrollments.ok) {
+        throw new ApiError('IoT Central error', 'Cannot list enrollment groups')
+    }
+    const enrollmentGroups = (await enrollments.json()).value
+    const attestation = enrollmentGroups.find(
+        (e: any) => e.type === 'iot' && e.attestation.type === 'symmetricKey'
+    )
+    if (!attestation) {
+        throw new ApiError(
+            'IoT Central error',
+            'Cannot find an enrollment group with symmetric keys attestation'
+        )
+    }
+    return {
+        idScope: await getCentralIdScope(appDomain, bearer),
+        ...attestation.symmetricKey,
+    }
 }
 
 export async function listJobs(appDomain: string) {

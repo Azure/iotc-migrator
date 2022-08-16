@@ -30,10 +30,11 @@ export default function App() {
     const [expanded, { toggle: toggleCollapse }] = useBoolean(true)
     const [account, setAccount] = useState<AccountInfo | null>(null)
     const [pageShown, setPageShown] = useState<'new' | 'status'>('new')
+    const [gotoItemId, setGotoItemId] = useState<string | undefined>(undefined)
     const [modalData, setModalData] = useState<{
         isOpen: boolean
-        title: string
-        message: string
+        title?: string
+        message: string | JSX.Element
     }>({ isOpen: false, title: '', message: '' })
 
     const loginToAzure = React.useCallback(async () => {
@@ -44,8 +45,18 @@ export default function App() {
         setAccount(auth)
     }, [])
 
-    const setErrorMessage = useCallback((err: ApiError) => {
-        setModalData({ isOpen: true, message: err.message, title: err.title })
+    const setModalMessage = useCallback((msg: ApiError | JSX.Element) => {
+        if (msg instanceof ApiError) {
+            setModalData({
+                isOpen: true,
+                message: msg.message,
+                title: msg.title,
+            })
+        } else
+            setModalData({
+                isOpen: true,
+                message: msg,
+            })
     }, [])
 
     useEffect(() => {
@@ -105,9 +116,18 @@ export default function App() {
                 </nav>
                 {account ? (
                     pageShown === 'new' ? (
-                        <NewMigration setErrorMessage={setErrorMessage} />
+                        <NewMigration
+                            setErrorMessage={setModalMessage}
+                            goToStatus={(jobId: string) => {
+                                setGotoItemId(jobId)
+                                setPageShown('status')
+                            }}
+                        />
                     ) : (
-                        <MigrationStatus setErrorMessage={setErrorMessage} />
+                        <MigrationStatus
+                            setErrorMessage={setModalMessage}
+                            gotoItemId={gotoItemId}
+                        />
                     )
                 ) : (
                     <div className='page'>
@@ -115,15 +135,12 @@ export default function App() {
                         <ProgressIndicator label='Waiting for authentication' />
                     </div>
                 )}
-                <Modal
-                    isOpen={modalData.isOpen}
-                    onDismiss={() => {
-                        setModalData((cur) => ({ ...cur, isOpen: false }))
-                    }}
-                >
+                <Modal isOpen={modalData.isOpen}>
                     <div className='flex vertical spaced-left spaced-right padding1'>
                         <div className='center-vertical'>
-                            <h3 className=''>{modalData.title}</h3>
+                            {modalData.title && (
+                                <h3 className=''>{modalData.title}</h3>
+                            )}
                             <IconButton
                                 iconProps={{ iconName: 'Cancel' }}
                                 styles={iconButtonStyles}
@@ -136,7 +153,11 @@ export default function App() {
                                 }
                             />
                         </div>
-                        <span>{modalData.message}</span>
+                        {typeof modalData.message === 'string' ? (
+                            <span>{modalData.message}</span>
+                        ) : (
+                            <>{modalData.message}</>
+                        )}
                     </div>
                 </Modal>
             </div>

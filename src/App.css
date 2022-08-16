@@ -13,8 +13,13 @@
     justify-content: space-between;
 }
 
-.nav {
+.nav,
+.height100 {
     height: 100%;
+}
+
+.width100 {
+    width: 100%;
 }
 
 .signOut {
@@ -105,4 +110,27 @@
 
 .padding1 {
     padding: 1em;
+}
+
+.webkit-vertical-align {
+    vertical-align: -webkit-baseline-middle;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.button {
+    width: 15em;
+}
+
+.modal-image {
+    width: 45em;
+    border: 1px solid black;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.icon {
+    font-size: 16px;
 }

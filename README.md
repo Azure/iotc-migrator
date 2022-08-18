@@ -1,76 +1,80 @@
-# Iotc-migrator
+# Azure IoT Central device migration tool
+A companion experience that enables you to move devices between IoT Central applications and from/to Azure IoT Hub.
 
-A Companion Experience that enables you to move devices between Azure IoT Central applications or move devices from an Azure IoT Central application to an Azure IoT Hub.
-
-## Requirement
-
-1. An IoT Central Application
-
+## Requirements
+- An IoT Central application (or two if moving between applications)
     > Go to [IoT Central](https://apps.azureiotcentral.com/home) to create one.
-
-2. Azure Active Directory Application (AAD).  
-
-    > Go to [Azure Portal > AAD > App registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) to create a new AAD Application and follow the [instruction below](#create-an-aad-application).
-
-3. An Azure IoT Hub instance
-
+- An Azure Active Directory Application (AAD)
+    > Follow instructions [here](./docs/appregistration.md).
+- An IoT Hub instance (if migrating from/to Azure IoT Hub)
     > Go to [Azure Portal > IoT Hub](https://portal.azure.com/#create/Microsoft.IotHub) to create one IoT Hub.
-
-4. An Azure IoT Hub Device Provisioning Services (DPS) associated to the IoT Hub instance
-
+- An Azure IoT Hub Device Provisioning Services (DPS) associated to the IoT Hub instance.
     > Go to [Azure Portal > DPS](https://portal.azure.com/#create/Microsoft.IoTDeviceProvisioning) to create one DPS.
 
 ## Setup
+Create a file called _.env_ in project root with following content after completed AAD creation steps above.
 
-Update the [config.ts](./src/config.ts) using the information from your AAD application.
-
-```typescript
-{
-    AADLoginServer: 'https://login.microsoftonline.com',
-    AADClientID: '<your-AAD-Application-(client)-ID>',
-    AADDirectoryID: '<your-AAD-Directory-(tenant)-ID>',
-    AADRedirectURI: 'http://localhost:3000',
-    applicationHost: '<your-iot-central-app>.azureiotcentral.com'
-}
+```ini
+PORT=3002
+REACT_APP_AAD_APP_CLIENT_ID=<your-AAD-Application-(client)-ID>
+REACT_APP_AAD_APP_TENANT_ID=<your-AAD-Directory-(tenant)-ID>
+REACT_APP_AAD_APP_REDIRECT_URI=http://localhost:3002
 ```
 
-> Make sure that the `AADRedirectURI` in the config file and the `Redirect URIs` specified in your AAD Application are the same.
+> Make sure that the REACT_APP_AAD_APP_REDIRECT_URI in the config file and the Redirect URIs specified in your AAD Application are the same.
 
-## First run
+### Model requirements
+To successfully perform a migration from an IoT Central application, the template for the devices to be migrated must comply to a specific configuration. The easiest and quickest way to define required capabilities is to import the _DeviceMigration_ component into the template.
 
-You can run the SPA in the development mode using:
+You can find the json file [here](./assets/deviceMigrationComponent.json). 
 
- `npm start`
+Follow instructions on [IoT Central official documentation](https://docs.microsoft.com/en-us/azure/iot-central/core/howto-set-up-template#interfaces-and-components).
 
-Open in the browser the `AADRedirectURI url` previously defined in your `config.ts` (by default is [http://localhost:3000](http://localhost:3000)) to view it in the browser.
+## Run
+You can run the tool in development mode using:
+```sh
+npm start
+```
+- Open in the browser the AADRedirectURI url previously defined in your _.env_ (by default is http://localhost:3002) to view it in the browser.
 
-Once the Application is loaded, follow the guidelines in the UI to perform a migration from the IoT Central application to Azure IoT Hub.
+- Authenticate the user.
 
- > NOTE: To perform successfully the migration, make sure that the _device template_ associated to your devices has a Command capability named __DeviceMove__.
 
-### Create an AAD Application
+### Options
+1. __IoT Central -> IoT Hub__
 
-1. Go to [Azure Portal > Azure Active Directory > App Registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
+Pick the needed values from source and target forms. Provide a name and click on _Migrate_ button.
 
-2. Click on _New Registration_
-![New registration](/assets/registerApp.png)
+Follow instructions on the page to create a new enrollment group in the DPS instance then click on _Start migration_.
 
-3. Fill the form using making sure to put in the `Redirect URI` the same value defined in the `config.ts` under _AADRedirectURI_
-![Create app](/assets/newApp.png)
+<img src='./assets/c2h.png' width='500px'/>
+<img src='./assets/copykeys.png' width='500px'/>
 
-4. Click _Register_ and once the app is created you will get the paramaters needed in the `config.ts`
-![App created](/assets/appCreated.png)
+2. __IoT Central -> IoT Central__
+
+Pick the needed values from source and target forms. 
+Optionally specify a target template to automatically assign migrating devices to a particular template in the application.
+Provide a name and click on _Migrate_ button. 
+Wait for the migration job to be configured. After that the job will automatically start and you can follow the progress in the _Migration status_ page.
+
+<img src='./assets/c2c.png' width='500px'/>
+
+3. __IoT Hub -> IoT Central__
+
+
+Select the hubs from which migrating devices, provide a name and click on _Migrate_ button. The job has been configured and available in the _Migration status_ page. Once there click on "Run" and provide the required keys following instructions.
+
+<img src='./assets/h2c.png' width='500px'/>
+<img src='./assets/status.png' width='500px'/>
+<img src='./assets/form.png' width='500px'/>
+
+Wait for the job to complete.
+
 
 ### Codebase
+_iotc-migrator_ is a React SPA application written in Typescript that runs 100% in the browser. It was bootstrapped with Create React App.
 
-Iotc-migrator is a React SPA application written in Typescript that runs 100% in the browser. It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The project consume public Azure APIs on the latest stable versions.
 
-The project consume the [IoT Central Rest APIs](https://docs.microsoft.com/rest/api/iotcentral/) with the following version: _1.1-preview_.
+The Authentication is performed using Microsoft Authentication Library (MSAL).
 
-The Authentication is performed using [Microsoft Authentication Library (MSAL)](https://www.npmjs.com/package/msal).
-
-### Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

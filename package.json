@@ -1,57 +1,23 @@
 {
-  "name": "iotc-migrator",
-  "version": "1.0.0",
+  "name": "iotc-migrator-v2",
+  "version": "0.1.0",
   "private": true,
-  "description": "A Companion Experience that enables you to move devices between Azure IoT Central applications or move devices from an Azure IoT Central application to an Azure IoT Hub",
-  "engines": {
-    "node": ">=16"
-  },
-  "author": "Azure IoT",
-  "license": "MIT",
   "dependencies": {
-    "@azure/msal-browser": "^2.23.0",
-    "@fluentui/react": "^8.64.1",
-    "@microsoft/azure-iot-ux-fluent-controls": "^8.0.8",
-    "@microsoft/azure-iot-ux-fluent-css": "^8.1.8",
-    "axios": "^0.26.1",
-    "react": "16.x",
-    "react-dom": "16.x",
-    "react-hook-form": "^7.29.0",
-    "react-router-dom": "^6.3.0",
-    "util": "^0.12.4",
-    "uuidv4": "^6.2.13"
-  },
-  "devDependencies": {
-    "classnames": "^2.3.1",
-    "node-sass": "^7.0.1",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^12.1.4",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.2",
-    "@types/react-router-dom": "^5.1.7",
-    "@typescript-eslint/eslint-plugin": "^5.19.0",
-    "@typescript-eslint/parser": "^5.19.0",
-    "eslint": "^8.13.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-plugin-etc": "^2.0.2",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.4.0",
-    "react-scripts": "^5.0.1",
-    "typescript": "^4.2.3",
+    "@azure/msal-browser": "^2.26.0",
+    "@fluentui/react": "^8.77.0",
+    "@fluentui/react-hooks": "^8.6.0",
+    "crypto-js": "^4.1.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
-  },
-  "peerDependencies": {
-    "react": "16.x",
-    "react-dom": "16.x"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "prettier --write --loglevel warn \"**/*.{js,json,md,ts,yml,yaml}\""
   },
   "eslintConfig": {
     "extends": [
@@ -70,5 +36,18 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^6.3.1",
+    "@types/crypto-js": "^4.1.1",
+    "@types/react": "^16.14.30",
+    "@types/uuid": "^8.3.4",
+    "eslint": "^8.21.0",
+    "prettier": "^2.7.1",
+    "react-scripts": "^5.0.1",
+    "typescript": "^4.7.4"
+  },
+  "overrides": {
+    "@svgr/webpack": "$@svgr/webpack"
   }
 }

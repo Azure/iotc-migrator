@@ -3,6 +3,7 @@ import {
     Coachmark,
     ConstrainMode,
     DetailsList,
+    DetailsListLayoutMode,
     IColumn,
     Icon,
     IconButton,
@@ -19,7 +20,6 @@ import { useBoolean } from '@fluentui/react-hooks'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
     createCentralEnrollment,
-    getCentralIdScope,
     getHubKeys,
     invokeCommand,
     listCentralApps,
@@ -38,7 +38,7 @@ import enrollmentScreen from '../enrollment.png'
 
 const gridStyles: Partial<IDetailsListStyles> = {
     root: {
-        overflowX: 'auto',
+        overflowX: 'hidden',
         selectors: {
             '& [role=grid]': {
                 display: 'flex',
@@ -48,13 +48,8 @@ const gridStyles: Partial<IDetailsListStyles> = {
             },
         },
     },
-    headerWrapper: {
-        flex: '0 0 auto',
-    },
     contentWrapper: {
         flex: '1 1 auto',
-        overflowY: 'auto',
-        overflowX: 'hidden',
     },
 }
 
@@ -80,6 +75,11 @@ const centralColumns: IColumn[] = [
     {
         key: 'dpsName',
         name: 'DPS',
+        minWidth: 200,
+    },
+    {
+        key: 'centralTarget',
+        name: 'IoT Central target application',
         minWidth: 200,
     },
     {
@@ -116,8 +116,8 @@ const hubColumns: IColumn[] = [
     {
         key: 'progress',
         name: '',
-        maxWidth: 200,
         minWidth: 200,
+        maxWidth: 200,
     },
 ]
 
@@ -135,14 +135,71 @@ function _onRenderCentralItemColumn(
                 </a>
             )
         case 'dpsName':
+            if (item?.data[0].value.dpsName) {
+                return (
+                    <a
+                        href={item?.data[0].value.dpsId}
+                        target='_blank'
+                        rel='noreferrer'
+                    >
+                        {item?.data[0].value.dpsName}
+                    </a>
+                )
+            }
+            return null
+        case 'centralTarget':
+            if (
+                item?.data[0].value.centralAppName &&
+                item?.data[0].value.centralAppSubdomain
+            ) {
+                return (
+                    <a
+                        href={item?.data[0].value.centralAppName}
+                        target='_blank'
+                        rel='noreferrer'
+                    >
+                        {`https://${item?.data[0].value.centralAppSubdomain}.azureiotcentral.com`}
+                    </a>
+                )
+            }
+            return null
+        case 'jobStatus':
+            const progress = item?.progress!
+            if (progress.pending > 0) {
+                return (
+                    <div className='flex horizontal between' id={item?.id}>
+                        <span className='spaced-right'>Pending</span>
+
+                        <Icon
+                            iconName='Running'
+                            className='icon'
+                            style={{ color: 'grey' }}
+                        />
+                    </div>
+                )
+            } else if (progress.failed > 0) {
+                return (
+                    <div className='flex horizontal between' id={item?.id}>
+                        <span className='spaced-right'>Failed</span>
+
+                        <Icon
+                            iconName='Error'
+                            className='icon'
+                            style={{ color: 'red' }}
+                        />
+                    </div>
+                )
+            }
             return (
-                <a
-                    href={item?.data[0].value.dpsId}
-                    target='_blank'
-                    rel='noreferrer'
-                >
-                    {item?.data[0].value.dpsName}
-                </a>
+                <div className='flex horizontal between' id={item?.id}>
+                    <span className='spaced-right'>Completed</span>
+
+                    <Icon
+                        iconName='Completed'
+                        className='icon'
+                        style={{ color: 'green' }}
+                    />
+                </div>
             )
         default:
             return <span>{fieldContent}</span>
@@ -165,10 +222,9 @@ export default React.memo<{
         onDismiss: () => Promise<void> | void
     } | null>(null)
 
-    const [
-        coachmarkShown,
-        { setTrue: showCoachmark, setFalse: hideCoachmark },
-    ] = useBoolean(!!gotoItemId)
+    const [coachmarkShown, { setFalse: hideCoachmark }] = useBoolean(
+        !!gotoItemId
+    )
 
     const progressStyles = useMemo(
         () => ({
@@ -222,7 +278,7 @@ export default React.memo<{
                 </div>
                 <div className='bottom-margin'>
                     <span>
-                        1. Open the DPS instance page on the Azure Potal (
+                        1. Open the DPS instance page on the Azure Portal (
                         <a
                             href={hubItem.dpsLink}
                             target='_blank'
@@ -297,8 +353,10 @@ export default React.memo<{
             )
             const devices = await listDevicesInHub(hubJob.hubHost, hubSas)
 
-            await createCentralEnrollment(hubJob.appHost, hubJob.enrollment!)
-            const centralIdScope = await getCentralIdScope(hubJob.appHost)
+            const targetEnrollment = await createCentralEnrollment(
+                hubJob.appHost,
+                hubJob.enrollment!
+            )
             try {
                 await Promise.all(
                     devices.map(async (device) => {
@@ -306,7 +364,7 @@ export default React.memo<{
                             hubJob.hubHost,
                             hubSas,
                             device.deviceId,
-                            centralIdScope
+                            targetEnrollment.idScope
                         )
                     })
                 )
@@ -316,7 +374,7 @@ export default React.memo<{
                 changeStatus(itemIdx, HubJobStatus.FAILED)
             }
         },
-        [changeStatus]
+        [changeStatus, setErrorMessage]
     )
 
     const _onRenderHubItemColumn = useCallback(
@@ -413,7 +471,7 @@ export default React.memo<{
                     )
             }
         },
-        [changeStatus, generateContent, loadDevices, openModal]
+        [changeStatus, generateContent, loadDevices, openModal, progressStyles]
     )
 
     const fetchJobs = useCallback(async () => {
@@ -444,7 +502,7 @@ export default React.memo<{
             <h2>Migration status</h2>
             <div className='formHeader center-vertical'>
                 <span>
-                    Watch all the IoT Central to IoT Hub migration processes.
+                    Watch all the migrations from IoT Central applications.
                 </span>
                 <IconButton
                     iconProps={{ iconName: 'Sync' }}
@@ -454,31 +512,37 @@ export default React.memo<{
                     }}
                 />
             </div>
-            <div className='bottom-margin width100'>
-                <ShimmeredDetailsList
-                    columns={centralColumns}
-                    items={centralItems}
-                    styles={gridStyles}
-                    skipViewportMeasures
-                    enableShimmer={centralItems.length === 0}
-                    constrainMode={ConstrainMode.unconstrained}
-                    selectionMode={SelectionMode.none}
-                    onRenderItemColumn={_onRenderCentralItemColumn}
-                />
-            </div>
-            <div className='formHeader center-vertical'>
-                <span>Manage IoTHub to IoT Central migration processes.</span>
-            </div>
-            <div className='bottom-margin width100'>
-                <DetailsList
-                    columns={hubColumns}
-                    items={hubItems}
-                    skipViewportMeasures
-                    selectionMode={SelectionMode.none}
-                    constrainMode={ConstrainMode.unconstrained}
-                    onRenderItemColumn={_onRenderHubItemColumn}
-                    styles={gridStyles}
-                />
+            <div className='width90'>
+                <div className='bottom-margin'>
+                    <DetailsList
+                        columns={centralColumns}
+                        items={centralItems}
+                        styles={gridStyles}
+                        skipViewportMeasures
+                        layoutMode={DetailsListLayoutMode.fixedColumns}
+                        // enableShimmer={centralItems.length === 0}
+                        constrainMode={ConstrainMode.unconstrained}
+                        selectionMode={SelectionMode.none}
+                        onRenderItemColumn={_onRenderCentralItemColumn}
+                    />
+                </div>
+                <div className='formHeader center-vertical'>
+                    <span>
+                        Watch and manage migrations from DPS and IoTHub.
+                    </span>
+                </div>
+                <div className='bottom-margin'>
+                    <DetailsList
+                        columns={hubColumns}
+                        items={hubItems}
+                        layoutMode={DetailsListLayoutMode.fixedColumns}
+                        skipViewportMeasures
+                        selectionMode={SelectionMode.none}
+                        constrainMode={ConstrainMode.unconstrained}
+                        onRenderItemColumn={_onRenderHubItemColumn}
+                        styles={gridStyles}
+                    />
+                </div>
             </div>
             {coachmarkShown && (
                 <Coachmark
@@ -494,10 +558,6 @@ export default React.memo<{
                     {modalData?.content}
                 </div>
             </Modal>
-            {/* <PrimaryButton
-                onClick={() => openModal({ dpsLink: '' } as any, 0)}
-                text='open'
-            /> */}
         </div>
     )
 })

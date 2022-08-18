@@ -17,9 +17,16 @@
 .height100 {
     height: 100%;
 }
+.height300 {
+    height: 300px;
+}
 
 .width100 {
     width: 100%;
+}
+
+.width90 {
+    width: 90%;
 }
 
 .signOut {
@@ -78,6 +85,10 @@
 .center-horizontal {
     display: flex;
     justify-content: center;
+}
+
+.flex.horizontal.between {
+    justify-content: space-between;
 }
 
 .section {

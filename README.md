@@ -1,70 +1,80 @@
-# Getting Started with Create React App
+# Azure IoT Central device migration tool
+A companion experience that enables you to move devices between IoT Central applications and from/to Azure IoT Hub.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Requirements
+- An IoT Central application (or two if moving between applications)
+    > Go to [IoT Central](https://apps.azureiotcentral.com/home) to create one.
+- An Azure Active Directory Application (AAD)
+    > Follow instructions [here](./docs/appregistration.md).
+- An IoT Hub instance (if migrating from/to Azure IoT Hub)
+    > Go to [Azure Portal > IoT Hub](https://portal.azure.com/#create/Microsoft.IotHub) to create one IoT Hub.
+- An Azure IoT Hub Device Provisioning Services (DPS) associated to the IoT Hub instance.
+    > Go to [Azure Portal > DPS](https://portal.azure.com/#create/Microsoft.IoTDeviceProvisioning) to create one DPS.
 
-## Available Scripts
+## Setup
+Create a file called _.env_ in project root with following content after completed AAD creation steps above.
 
-In the project directory, you can run:
+```ini
+PORT=3002
+REACT_APP_AAD_APP_CLIENT_ID=<your-AAD-Application-(client)-ID>
+REACT_APP_AAD_APP_TENANT_ID=<your-AAD-Directory-(tenant)-ID>
+REACT_APP_AAD_APP_REDIRECT_URI=http://localhost:3002
+```
 
-### `npm start`
+> Make sure that the REACT_APP_AAD_APP_REDIRECT_URI in the config file and the Redirect URIs specified in your AAD Application are the same.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Model requirements
+To successfully perform a migration from an IoT Central application, the template for the devices to be migrated must comply to a specific configuration. The easiest and quickest way to define required capabilities is to import the _DeviceMigration_ component into the template.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+You can find the json file [here](./assets/deviceMigrationComponent.json). 
 
-### `npm test`
+Follow instructions on [IoT Central official documentation](https://docs.microsoft.com/en-us/azure/iot-central/core/howto-set-up-template#interfaces-and-components).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Run
+You can run the tool in development mode using:
+```sh
+npm start
+```
+- Open in the browser the AADRedirectURI url previously defined in your _.env_ (by default is http://localhost:3002) to view it in the browser.
 
-### `npm run build`
+- Authenticate the user.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Options
+1. __IoT Central -> IoT Hub__
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Pick the needed values from source and target forms. Provide a name and click on _Migrate_ button.
 
-### `npm run eject`
+Follow instructions on the page to create a new enrollment group in the DPS instance then click on _Start migration_.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+<img src='./assets/c2h.png' width='500px'/>
+<img src='./assets/copykeys.png' width='500px'/>
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. __IoT Central -> IoT Central__
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Pick the needed values from source and target forms. 
+Optionally specify a target template to automatically assign migrating devices to a particular template in the application.
+Provide a name and click on _Migrate_ button. 
+Wait for the migration job to be configured. After that the job will automatically start and you can follow the progress in the _Migration status_ page.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+<img src='./assets/c2c.png' width='500px'/>
 
-## Learn More
+3. __IoT Hub -> IoT Central__
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Select the hubs from which migrating devices, provide a name and click on _Migrate_ button. The job has been configured and available in the _Migration status_ page. Once there click on "Run" and provide the required keys following instructions.
 
-### Code Splitting
+<img src='./assets/h2c.png' width='500px'/>
+<img src='./assets/status.png' width='500px'/>
+<img src='./assets/form.png' width='500px'/>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Wait for the job to complete.
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Codebase
+_iotc-migrator_ is a React SPA application written in Typescript that runs 100% in the browser. It was bootstrapped with Create React App.
 
-### Making a Progressive Web App
+The project consume public Azure APIs on the latest stable versions.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+The Authentication is performed using Microsoft Authentication Library (MSAL).
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

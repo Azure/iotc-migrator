@@ -8,12 +8,13 @@ import {
 } from '@fluentui/react'
 import { useBoolean } from '@fluentui/react-hooks'
 import React, { useCallback, useEffect, useState } from 'react'
-import { login, loginSilent, logout } from './api'
+import { getDPSKeys, login, loginSilent, logout } from './api'
 import './App.css'
 import { NavigatorItem, Navigator } from './navigation'
 import MigrationStatus from './pages/migrationStatus'
 import NewMigration from './pages/newMigration'
 import { ApiError } from './types'
+import { generateSaSToken } from './utils'
 
 const iconButtonStyles: Partial<IButtonStyles> = {
     root: {
@@ -43,6 +44,8 @@ export default function App() {
             auth = (await login()).account
         }
         setAccount(auth)
+        const keys=await getDPSKeys('/subscriptions/2efa8bb6-25bf-4895-ba64-33806dd00780/resourceGroups/paas/providers/Microsoft.Devices/provisioningServices/migratordps', 'provisioningserviceowner');
+        console.log(generateSaSToken('migratordps.azure-devices-provisioning.net',keys.primaryKey,'provisioningserviceowner'));
     }, [])
 
     const setModalMessage = useCallback((msg: ApiError | JSX.Element) => {

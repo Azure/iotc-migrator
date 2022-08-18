@@ -1,0 +1,78 @@
+{
+    "@id": "dtmi:azureiot:DeviceMigration;1",
+    "@type": "Interface",
+    "contents": [
+        {
+            "@type": "Command",
+            "commandType": "synchronous",
+            "displayName": {
+                "en": "DeviceMove"
+            },
+            "name": "DeviceMove",
+            "request": {
+                "@type": "CommandPayload",
+                "displayName": {
+                    "en": "Data"
+                },
+                "name": "data",
+                "schema": {
+                    "@type": "Object",
+                    "displayName": {
+                        "en": "Object"
+                    },
+                    "fields": [
+                        {
+                            "displayName": {
+                                "en": "Id Scope"
+                            },
+                            "name": "idScope",
+                            "schema": "string"
+                        },
+                        {
+                            "displayName": {
+                                "en": "DPS name"
+                            },
+                            "name": "dpsName",
+                            "schema": "string"
+                        },
+                        {
+                            "displayName": {
+                                "en": "DPS Id"
+                            },
+                            "name": "dpsId",
+                            "schema": "string"
+                        },
+                        {
+                            "displayName": {
+                                "en": "IoT Central Destination Name"
+                            },
+                            "name": "centralAppName",
+                            "schema": "string"
+                        },
+                        {
+                            "displayName": {
+                                "en": "IoT Central Destination Subdomain"
+                            },
+                            "name": "centralAppSubdomain",
+                            "schema": "string"
+                        },
+                        {
+                            "displayName": {
+                                "en": "IoT Central Destination Template"
+                            },
+                            "name": "deviceTemplateId",
+                            "schema": "string"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "displayName": {
+        "en": "Device Migration"
+    },
+    "@context": [
+        "dtmi:iotcentral:context;2",
+        "dtmi:dtdl:context;2"
+    ]
+}

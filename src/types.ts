@@ -56,6 +56,7 @@ export type DPSTargetParams = {
 
 export interface ServiceBase {
     id: string
+    name: string
 }
 
 export interface CentralSourceService extends ServiceBase {
@@ -83,14 +84,17 @@ export type TargetService = CentralTargetService | DPSTargetService
 
 export type CommandPayload = {
     idScope: string
-    dpsName: string
-    dpsId: string
+    dpsName?: string
+    dpsId?: string
+    centralAppName?: string
+    centralAppSubdomain?: string
+    deviceTemplateId?: string
 }
 
 export type EnrollmentGroup = {
     primaryKey: string
     secondaryKey: string
-    idScope?: string
+    idScope: string
 }
 
 export type JobPayload = {
@@ -118,6 +122,12 @@ export type JobResult = {
         path: string
         value: CommandPayload
     }[]
+    progress: {
+        total: number
+        completed: number
+        failed: number
+        pending: number
+    }
     status: string
     appName?: string
     jobLink?: string
@@ -131,7 +141,7 @@ export enum HubJobStatus {
 }
 
 export type HubJob = {
-    id:string,
+    id: string
     hubName: string
     hubHost: string
     appHost: string

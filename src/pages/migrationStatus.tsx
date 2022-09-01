@@ -364,7 +364,8 @@ export default React.memo<{
                             hubJob.hubHost,
                             hubSas,
                             device.deviceId,
-                            targetEnrollment.idScope
+                            targetEnrollment.idScope,
+                            hubJob.templateId
                         )
                     })
                 )

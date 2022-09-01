@@ -596,6 +596,9 @@ export default React.memo<{
                         dpsIdScope: params.idScope,
                         dpsHost: params.dpsHost,
                         appHost: values.target.id,
+                        templateId: (
+                            values.target.params as CentralTargetParams
+                        ).deviceTemplateId!,
                         status: HubJobStatus.PENDING,
                     })
                 )

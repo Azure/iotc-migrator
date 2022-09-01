@@ -151,6 +151,7 @@ export type HubJob = {
     dpsHost: string
     dpsIdScope: string
     status: HubJobStatus
+    templateId?:string,
     enrollment?: {
         primaryKey: string
         secondaryKey: string

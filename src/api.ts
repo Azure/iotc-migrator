@@ -341,7 +341,7 @@ export async function invokeCommand(
         },
         body: JSON.stringify({
             methodName: 'DeviceMove',
-            payload: JSON.stringify({ idScope, deviceTemplateId }),
+            payload: { idScope, deviceTemplateId },
         }),
     }
     const cmdResp = await fetch(

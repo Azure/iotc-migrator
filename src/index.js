@@ -7,7 +7,7 @@ import { initializeIcons } from '@fluentui/font-icons-mdl2';
 
 initializeIcons();
 
-const root = ReactDOM.render(
+ReactDOM.render(
 
   <React.StrictMode>
     <App />

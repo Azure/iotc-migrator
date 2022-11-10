@@ -12,7 +12,6 @@ import {
     PrimaryButton,
     ProgressIndicator,
     SelectionMode,
-    ShimmeredDetailsList,
     Stack,
     TextField,
 } from '@fluentui/react'

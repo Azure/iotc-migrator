@@ -1,0 +1,11 @@
+# Node
+node_modules
+dist
+.npmrc
+
+# Python
+.pyenv
+.venv
+
+# Env
+.env

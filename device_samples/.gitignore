@@ -9,3 +9,7 @@ dist
 
 # Env
 .env
+
+# dotnet
+bin/
+obj/

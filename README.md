@@ -30,6 +30,8 @@ You can find the json file [here](./assets/deviceMigrationComponent.json).
 
 Follow instructions on [IoT Central official documentation](https://docs.microsoft.com/en-us/azure/iot-central/core/howto-set-up-template#interfaces-and-components).
 
+>This repository contains few [code samples](./device_samples) showing how to handle the migration process from device side.
+
 ## Run
 You can run the tool in development mode using:
 ```sh

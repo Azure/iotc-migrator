@@ -44,8 +44,6 @@ export default function App() {
             auth = (await login()).account
         }
         setAccount(auth)
-        const keys=await getDPSKeys('/subscriptions/2efa8bb6-25bf-4895-ba64-33806dd00780/resourceGroups/paas/providers/Microsoft.Devices/provisioningServices/migratordps', 'provisioningserviceowner');
-        console.log(generateSaSToken('migratordps.azure-devices-provisioning.net',keys.primaryKey,'provisioningserviceowner'));
     }, [])
 
     const setModalMessage = useCallback((msg: ApiError | JSX.Element) => {

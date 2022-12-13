@@ -376,7 +376,7 @@ export default React.memo<{
                 setErrorMessage(
                     new ApiError(
                         'Invalid device template',
-                        'The selected device template does not contain the Device Migration component.\nPlease include the component as descrived in the documentation.'
+                        'The selected device template does not contain the Device Migration component.\nPlease include the component as described in the documentation.'
                     )
                 )
             } else {

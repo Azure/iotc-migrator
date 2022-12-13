@@ -479,19 +479,24 @@ export default React.memo<{
         const apps = await listCentralApps()
         const jobs = await Promise.all(
             apps.map(async (a) => {
-                const appJobs: JobResult[] = (
-                    await listJobs(a.properties.subdomain)
-                )
-                    .filter((job: JobResult) => job.id)
-                    .map((job: JobResult) => ({
-                        ...job,
-                        appName: a.name,
-                        jobLink: `https://${a.properties.subdomain}.azureiotcentral.com/jobs/instances/${job.id}`,
-                    }))
-                return appJobs
+                try {
+                    const appJobs: JobResult[] = (
+                        await listJobs(a.properties.subdomain)
+                    )
+                        .filter((job: JobResult) => job.id)
+                        .map((job: JobResult) => ({
+                            ...job,
+                            appName: a.name,
+                            jobLink: `https://${a.properties.subdomain}.azureiotcentral.com/jobs/instances/${job.id}`,
+                        }))
+                    return appJobs
+                }
+                catch (ex) {
+                    return null;
+                }
             })
         )
-        setCentralItems(jobs.flat())
+        setCentralItems((jobs.filter(j => j !== null) as JobResult[][]).flat())
     }, [])
 
     useEffect(() => {
@@ -515,13 +520,13 @@ export default React.memo<{
             </div>
             <div className='width90'>
                 <div className='bottom-margin'>
-                    <DetailsList
+                    <ShimmeredDetailsList
                         columns={centralColumns}
                         items={centralItems}
                         styles={gridStyles}
                         skipViewportMeasures
                         layoutMode={DetailsListLayoutMode.fixedColumns}
-                        // enableShimmer={centralItems.length === 0}
+                        enableShimmer={centralItems.length === 0}
                         constrainMode={ConstrainMode.unconstrained}
                         selectionMode={SelectionMode.none}
                         onRenderItemColumn={_onRenderCentralItemColumn}

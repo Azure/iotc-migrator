@@ -129,10 +129,18 @@ export async function logout() {
     })
 }
 
-export async function getToken(resource: string) {
+export async function getToken(resource: string, useHome?: boolean) {
     try {
         if (!account) {
             throw new Error('Account not found')
+        }
+        const homeTenant = account.homeAccountId.split('.')[1];
+        if (useHome && homeTenant !== process.env['REACT_APP_AAD_APP_TENANT_ID']) {
+            const auth = await msalInstance.loginPopup({
+                authority: `https://login.microsoftonline.com/${homeTenant}`,
+                scopes: [resource]
+            });
+            return auth.accessToken;
         }
         const authResult = await msalInstance.acquireTokenSilent({
             scopes: [resource],
@@ -386,7 +394,7 @@ export async function listCentralApps() {
 }
 
 export async function listDeviceGroups(appSubdomain: string) {
-    const centralToken = await getToken(TOKEN_AUDIENCES.Central)
+    const centralToken = await getToken(TOKEN_AUDIENCES.Central, true)
     const params = {
         method: 'GET',
         headers: {
@@ -423,8 +431,7 @@ export async function createCentralEnrollment(
         }),
     }
     const enrollmentGroup = await fetch(
-        `https://${appSubdomain}.azureiotcentral.com/api/enrollmentGroups/${uuid()}?api-version=${
-            API_VERSIONS.Central
+        `https://${appSubdomain}.azureiotcentral.com/api/enrollmentGroups/${uuid()}?api-version=${API_VERSIONS.Central
         }`,
         params
     )
@@ -449,9 +456,9 @@ export async function createCentralEnrollment(
                     enrl.type === 'iot' &&
                     enrl.attestation.type === 'symmetricKey' &&
                     enrl.attestation.symmetricKey?.primaryKey ===
-                        symmetricKey.primaryKey &&
+                    symmetricKey.primaryKey &&
                     enrl.attestation.symmetricKey.secondaryKey ===
-                        symmetricKey.secondaryKey
+                    symmetricKey.secondaryKey
             )
             if (!resp) {
                 throw new ApiError(
@@ -631,8 +638,7 @@ export async function createMigrationJob(
         },
     }
     const job = await fetch(
-        `https://${appSubdomain}.azureiotcentral.com/api/jobs/${uuid()}?api-version=${
-            API_VERSIONS.Central
+        `https://${appSubdomain}.azureiotcentral.com/api/jobs/${uuid()}?api-version=${API_VERSIONS.Central
         }`,
         params
     )

@@ -26,7 +26,6 @@ import {
     listHubs,
     getCentralCredentials,
     createCentralEnrollment,
-    createDpsEnrollment,
     getCentralEnrollment,
 } from '../api'
 import {
